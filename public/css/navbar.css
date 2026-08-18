@@ -1,0 +1,7 @@
+.sm-connect-button div {
+    justify-content: space-between;
+}
+
+.sm-connect-button div svg {
+    order: 1
+}

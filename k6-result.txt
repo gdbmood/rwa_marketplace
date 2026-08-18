@@ -1,0 +1,42 @@
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: k6.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 500 max VUs, 14m30s max duration (incl. graceful stop):
+              * default: Up to 500 looping VUs for 14m0s over 7 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 295378  351.164021/s
+    checks_succeeded...................: 100.00% 295378 out of 295378
+    checks_failed......................: 0.00%   0 out of 295378
+
+    ✓ status is 200
+    ✓ body is not empty
+
+    HTTP
+    http_req_duration.......................................................: avg=565.71ms min=52.35ms med=494.14ms max=7.86s p(90)=1.01s p(95)=1.26s
+      { expected_response:true }............................................: avg=565.71ms min=52.35ms med=494.14ms max=7.86s p(90)=1.01s p(95)=1.26s
+    http_req_failed.........................................................: 0.00%  0 out of 147689
+    http_reqs...............................................................: 147689 175.582011/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=1.56s    min=1.05s   med=1.49s    max=8.86s p(90)=2.01s p(95)=2.27s
+    iterations..............................................................: 147689 175.582011/s
+    vus.....................................................................: 1      min=1           max=500
+    vus_max.................................................................: 500    min=500         max=500
+
+    NETWORK
+    data_received...........................................................: 13 GB  15 MB/s
+    data_sent...............................................................: 40 MB  48 kB/s
+
+running (14m01.1s), 000/500 VUs, 147689 complete and 0 interrupted iterations
+default ✓ [======================================] 000/500 VUs  14m0s
