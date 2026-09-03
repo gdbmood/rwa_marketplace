@@ -1,41 +1,30 @@
-import { initializeFirebaseAdminApp } from '@/lib/firebaseServer';
-import ListingCard, { NFTOwner } from '@/components/listing-card';
-import GetStartedButton from '@/components/get-started-button';
 import { Box, Typography, Container } from '@mui/material';
-import { getFirestore } from 'firebase-admin/firestore';
-import { BusinessUser } from '@/types/Users';
-import fetchNFTs from '@/utils/fetchNFTs';
-import { Asset } from '@/types/Asset';
+import GetStartedButton from '@/components/get-started-button';
+import AssetCard from '@/components/marketplace/asset-card';
+import { type MarketplaceAssetRow, listMarketplaceAssets } from '@/lib/db/assets';
 import Image from 'next/image';
 
+/**
+ * Landing hero. Server component: reads the public v_marketplace view through
+ * the repository layer and shows the four highest priced active assets. A
+ * failed read renders the hero without the cards instead of crashing the
+ * landing page.
+ */
 export default async function HeroSection() {
-    initializeFirebaseAdminApp()
-
-    const db = getFirestore();
-
-    const nfts = await fetchNFTs();
-    const assets = await db.collection('Asset').get().then((snapshot) => {
-        return snapshot.docs.map((doc) => ({ _id: doc.id, ...doc.data() }) as Asset)
-    });
-    const filterObjsRaw = await Promise.all(assets.map(async (asset) => {
-        const nft = nfts.find((nft) => nft.nftId === Number(asset._id));
-        if (!nft) return null;
-
-        const nftOwnerSnapshot = await db.collection('BusinessUser').doc(nft.nftOwner).get();
-        const nftOwnerData = nftOwnerSnapshot.data() as BusinessUser | undefined;
-
-        return {
-            nft: nft,
-            asset: asset,
-            nftOwner: {
-                username: nftOwnerData?.displayName || '',
-                logo: nftOwnerData?.logo
-            } as NFTOwner
-        };
-    }));
-    const filterObjs = filterObjsRaw
-        .filter(item => item !== null)
-        .sort((a, b) => { return b.asset.pricePerFraction - a.asset.pricePerFraction });
+    let featured: MarketplaceAssetRow[] = [];
+    try {
+        const assets = await listMarketplaceAssets();
+        featured = assets
+            .slice()
+            .sort(
+                (a, b) =>
+                    (b.floor_price_per_fraction ?? b.mint_price_per_fraction ?? 0) -
+                    (a.floor_price_per_fraction ?? a.mint_price_per_fraction ?? 0),
+            )
+            .slice(0, 4);
+    } catch (error) {
+        console.error('HeroSection: could not load featured assets:', error);
+    }
 
     return (
         <Box sx={{
@@ -57,15 +46,17 @@ export default async function HeroSection() {
                         Bridging Reality and Blockchain
                     </Typography>
                     <Typography sx={{ typography: { xs: 'subtitle1', verticalTablet: 'h5' }, color: '#FAFAFA', py: '10px' }}>
-                        Where blockchain meets tangible investments with Fractionnaire. Navigate through our platform to explore seamless asset tokenization. Click 'Get Started' to begin your journey into decentralized finance.
+                        Where blockchain meets tangible investments with Fractionnaire. Navigate through our platform to explore seamless asset tokenization. Click &apos;Get Started&apos; to begin your journey into decentralized finance.
                     </Typography>
                 </Box>
 
-                <Box sx={{ mt: { xs: 3, sm: 5, horizontalTablet: 7 }, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 2.5 } }}>
-                    {filterObjs.slice(0, 4).map((item, index) => (
-                        <ListingCard key={index} item={item} />
-                    ))}
-                </Box>
+                {featured.length > 0 && (
+                    <Box sx={{ mt: { xs: 3, sm: 5, horizontalTablet: 7 }, display: 'flex', flexWrap: 'wrap', alignItems: 'stretch', gap: { xs: 1, sm: 2.5 } }}>
+                        {featured.map((asset) => (
+                            <AssetCard key={asset.asset_id} asset={asset} />
+                        ))}
+                    </Box>
+                )}
 
                 <Box sx={{ display: { xs: "block", horizontalTablet: "none" }, mt: { xs: 2, sm: 5 }, px: { xs: 0, sm: 2, verticalTablet: 10 } }}>
                     <GetStartedButton />

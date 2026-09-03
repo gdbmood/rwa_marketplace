@@ -203,6 +203,23 @@ export async function listMarketplaceAssets(
   return unwrap(result, 'assets.listMarketplaceAssets');
 }
 
+/**
+ * Public marketplace rows for one issuer (active and sold out assets), used
+ * by the public business profile page.
+ */
+export async function listMarketplaceAssetsByBusiness(
+  businessId: string,
+): Promise<MarketplaceAssetRow[]> {
+  const db = createServiceClient();
+  const result = await db
+    .from('v_marketplace')
+    .select('*')
+    .eq('business_id', businessId)
+    .in('status', ['active', 'sold_out'])
+    .order('created_at', { ascending: false });
+  return unwrap(result, 'assets.listMarketplaceAssetsByBusiness');
+}
+
 export async function listAssetsByBusiness(businessId: string): Promise<AssetRow[]> {
   const db = createServiceClient();
   const result = await db

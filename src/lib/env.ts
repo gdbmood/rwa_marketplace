@@ -26,7 +26,8 @@ export type ServerEnvName =
   | 'SUMSUB_WEBHOOK_SECRET'
   | 'INDEXER_RPC_URL'
   | 'CHAIN_WEBHOOK_SECRET'
-  | 'EXCHANGE_RATE_API_KEY';
+  | 'EXCHANGE_RATE_API_KEY'
+  | 'THIRDWEB_WEBHOOK_SECRET';
 
 // Literal member accesses are required for Next.js build-time inlining.
 const publicReaders: Record<PublicEnvName, () => string | undefined> = {
@@ -128,5 +129,8 @@ export const serverEnv = {
   },
   get exchangeRateApiKey(): string {
     return requireServerEnv('EXCHANGE_RATE_API_KEY');
+  },
+  get thirdwebWebhookSecret(): string {
+    return requireServerEnv('THIRDWEB_WEBHOOK_SECRET');
   },
 };

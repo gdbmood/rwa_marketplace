@@ -1,8 +1,8 @@
 "use client";
 
 import { Box, Button, Chip, CircularProgress, Modal, Typography } from "@mui/material";
-import { useActiveAccount, useSendAndConfirmTransaction } from "thirdweb/react";
-import { prepareContractCall } from "thirdweb";
+import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
+import { useActiveAccountCompat } from "@/hooks/useActiveAccountCompat";
 import { contract, getContractByAddress } from "@/lib/thirdWebClient";
 import { createListing } from "@/utils/ABI";
 import { getAssetDetail, markAssetMinting } from "@/actions/assets";
@@ -57,9 +57,7 @@ export default function MintModal(props: {
     businessDisplayName: string;
 }) {
     const router = useRouter();
-    const wallet = useActiveAccount();
-    const { mutateAsync: sendMintTx } = useSendAndConfirmTransaction();
-    const { mutateAsync: sendApproveTx } = useSendAndConfirmTransaction();
+    const wallet = useActiveAccountCompat();
 
     const [step, setStep] = useState<MintStep>("preview");
     const [error, setError] = useState("");
@@ -80,12 +78,15 @@ export default function MintModal(props: {
     }
 
     async function approveMarketplace(tokenAddress: string) {
+        if (!wallet) {
+            throw new Error("Please connect your wallet");
+        }
         const approveTx = prepareContractCall({
             contract: getContractByAddress(tokenAddress),
             method: "function approve(address spender, uint256 amount) returns (bool)",
             params: [contract.address, BigInt(props.values.fractions)],
         });
-        await sendApproveTx(approveTx);
+        await sendAndConfirmTransaction({ transaction: approveTx, account: wallet });
     }
 
     async function waitAndApprove() {
@@ -130,7 +131,7 @@ export default function MintModal(props: {
                     JSON.stringify(metadata),
                 ],
             });
-            const receipt = await sendMintTx(transaction);
+            const receipt = await sendAndConfirmTransaction({ transaction, account: wallet });
 
             setStep("recording");
             const marked = await markAssetMinting(props.draftId, receipt.transactionHash);

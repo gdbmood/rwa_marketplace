@@ -61,10 +61,10 @@ const SumsubVerification = () => {
                 <SumsubWebSdk
                     accessToken={token}
                     expirationHandler={fetchToken}
-                    onError={(error: any) => {
+                    onError={(error: unknown) => {
                         console.error('Error:', error);
                     }}
-                    onMessage={(message: any) => {
+                    onMessage={(message: string) => {
                         if (message.includes('onApplicantStatusChanged')) {
                             if (localStorage) {
                                 const redirectUrl = localStorage.getItem('redirectUrl');

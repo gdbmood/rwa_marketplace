@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getAssetDetail } from '@/actions/assets';
 import { requireUser } from '@/lib/auth/session';
-import { getApprovedKycForUser } from '@/lib/sumsub/kyc';
+import { getApprovedKycForUser } from '@/lib/db/kyc';
 import type { ViewerState } from '@/components/asset-detail/asset-detail-view';
 import AssetNotFound from '@/components/asset-detail/asset-not-found';
 import BuyFlow from '@/components/buy/buy-flow';
@@ -24,9 +24,9 @@ async function getViewerState(kycRequired: boolean): Promise<ViewerState> {
     if (kycRequired && !kycApproved) {
       kycApproved = Boolean(await getApprovedKycForUser(user.id));
     }
-    return { loggedIn: true, kycApproved };
+    return { loggedIn: true, kycApproved, isOwner: false };
   } catch {
-    return { loggedIn: false, kycApproved: false };
+    return { loggedIn: false, kycApproved: false, isOwner: false };
   }
 }
 

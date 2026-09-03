@@ -14,6 +14,7 @@ import {
 
 export type UserRow = Row<'users'>;
 export type UserType = Enum<'user_type'>;
+export type BusinessProfileRow = Row<'business_profiles'>;
 
 const PROFILE_FIELDS = [
   'name',
@@ -36,6 +37,22 @@ export async function getUserByWallet(wallet: string): Promise<UserRow | null> {
     .eq('wallet_address', lowercaseWallet(wallet))
     .maybeSingle();
   return unwrapMaybe(result, 'users.getUserByWallet');
+}
+
+/**
+ * Public business projection (display name and logo only), used by the public
+ * business profile page. Returns null for unknown ids.
+ */
+export async function getBusinessProfileByUserId(
+  userId: string,
+): Promise<BusinessProfileRow | null> {
+  const db = createServiceClient();
+  const result = await db
+    .from('business_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  return unwrapMaybe(result, 'users.getBusinessProfileByUserId');
 }
 
 /**

@@ -7,7 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
 import Table from "@mui/material/Table";
-import { styled } from "@mui/material/styles";
+import { styled, type PaletteOptions } from "@mui/material/styles";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -20,28 +20,34 @@ import {
     shortenAddress,
 } from "@/components/business/types";
 
-const StyledTableCell = styled(TableCell)(({ theme }: { theme: any }) => ({
+// The custom palette sections (marketplace, portfolio) are declared on
+// PaletteOptions in src/theme.ts but not on Palette, so the runtime palette
+// is read through the options type.
+const appPalette = (theme: { palette: unknown }) =>
+    theme.palette as PaletteOptions;
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         fontFamily: "Roboto",
-        backgroundColor: theme.palette.marketplace?.background,
-        color: theme.palette.portfolio?.tableText,
+        backgroundColor: appPalette(theme).marketplace?.background,
+        color: appPalette(theme).portfolio?.tableText,
         borderColor: "rgba(255, 255, 255, 0.12)",
         fontWeight: 500,
         fontSize: 14,
     },
     [`&.${tableCellClasses.body}`]: {
         fontSize: 14,
-        color: theme.palette.portfolio?.tableText,
+        color: appPalette(theme).portfolio?.tableText,
         borderColor: "rgba(255, 255, 255, 0.12)",
     },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }: { theme: any }) => ({
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
     "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.portfolio?.tableOddRow,
+        backgroundColor: appPalette(theme).portfolio?.tableOddRow,
     },
     "&:nth-of-type(even)": {
-        backgroundColor: theme.palette.portfolio?.tableEvenRow,
+        backgroundColor: appPalette(theme).portfolio?.tableEvenRow,
     },
 }));
 

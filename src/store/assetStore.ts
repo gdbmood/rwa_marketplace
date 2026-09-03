@@ -14,8 +14,8 @@ import { getPublicSupabase } from '@/hooks/useSupabaseBrowser';
  *    `floor_price_per_fraction` replaces `pricePerFraction`,
  *    `total_supply`/`available_supply` replace initial/availableSupply
  *  - draft assets appear with status 'draft' (rendered as Coming soon)
- *  - the store no longer chains into nftStore; screens that need on-chain
- *    NFT metadata fetch it explicitly
+ *  - the store no longer chains into an on-chain NFT store; screens that
+ *    need on-chain NFT metadata fetch it explicitly
  */
 
 export type MarketplaceAsset = Tables<'v_marketplace'>;

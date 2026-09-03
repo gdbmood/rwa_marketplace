@@ -41,6 +41,8 @@ import { useDisplayCurrency } from '@/components/investor/useDisplayCurrency';
 export interface ViewerState {
   loggedIn: boolean;
   kycApproved: boolean;
+  /** True when the viewer is the business that minted this asset. */
+  isOwner: boolean;
 }
 
 export interface SellerName {
@@ -312,6 +314,26 @@ export default function AssetDetailView({
               <Typography variant="body1" sx={{ color: 'marketplace.filterButtonText', mt: 2 }}>
                 {asset.description}
               </Typography>
+            )}
+
+            {viewer.isOwner && asset.asset_id && (
+              <Button
+                onClick={() => router.push(`/asset/${asset.asset_id}/update`)}
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  backgroundColor: 'marketplace.viewMoreButtonBackground',
+                  border: 1,
+                  borderColor: 'marketplace.searchButtonBorder',
+                  color: 'navbar.primary',
+                  borderRadius: 5,
+                  px: 3,
+                  py: 1,
+                  textTransform: 'none',
+                }}
+              >
+                Update asset data
+              </Button>
             )}
 
             <Box

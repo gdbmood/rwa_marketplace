@@ -1,8 +1,8 @@
 "use client";
 
 import { Box, Button, CircularProgress, Modal, Typography } from "@mui/material";
-import { useActiveAccount, useSendAndConfirmTransaction } from "thirdweb/react";
-import { prepareContractCall } from "thirdweb";
+import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
+import { useActiveAccountCompat } from "@/hooks/useActiveAccountCompat";
 import { contract } from "@/lib/thirdWebClient";
 import { unlistNFT, updateListing } from "@/utils/ABI";
 import { cancelListing, updateListingPrice } from "@/actions/listings";
@@ -40,9 +40,7 @@ export default function UpdateAssetView(props: {
     primaryListing: PrimaryListingDto | null;
 }) {
     const router = useRouter();
-    const wallet = useActiveAccount();
-    const { mutateAsync: sendUpdateTx } = useSendAndConfirmTransaction();
-    const { mutateAsync: sendUnlistTx } = useSendAndConfirmTransaction();
+    const wallet = useActiveAccountCompat();
 
     const [values, setValues] = useState<AssetFormValues>(props.initialValues);
     const [error, setError] = useState("");
@@ -92,7 +90,7 @@ export default function UpdateAssetView(props: {
                     JSON.stringify(metadata),
                 ],
             });
-            const receipt = await sendUpdateTx(transaction);
+            const receipt = await sendAndConfirmTransaction({ transaction, account: wallet });
 
             if (props.primaryListing) {
                 const recorded = await updateListingPrice({
@@ -132,7 +130,7 @@ export default function UpdateAssetView(props: {
                 method: unlistNFT,
                 params: [BigInt(props.asset.nftId), usdcToMicro(listing.pricePerFraction)],
             });
-            const receipt = await sendUnlistTx(transaction);
+            const receipt = await sendAndConfirmTransaction({ transaction, account: wallet });
 
             const recorded = await cancelListing({
                 listingId: listing.id,

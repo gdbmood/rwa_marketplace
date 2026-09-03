@@ -1,8 +1,10 @@
 "use client";
 
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import { useActiveWalletConnectionStatus, useConnectModal } from "thirdweb/react";
+import { useConnectModal } from "thirdweb/react";
+import { useConnectionStatusCompat } from "@/hooks/useActiveAccountCompat";
 import { connectWalletConfig } from "@/utils/thirdwebConfig";
+import { isTestMode } from "@/lib/wallet/testAccount";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { isLoggedIn } from "@/actions/login";
@@ -14,7 +16,7 @@ import { isLoggedIn } from "@/actions/login";
  */
 export default function BusinessAuthGate(props: { message?: string }) {
     const router = useRouter();
-    const status = useActiveWalletConnectionStatus();
+    const status = useConnectionStatusCompat();
     const { connect, isConnecting } = useConnectModal();
 
     const [checking, setChecking] = useState(false);
@@ -44,7 +46,9 @@ export default function BusinessAuthGate(props: { message?: string }) {
                 }
             });
         }
-        if (status === 'disconnected' && !openedRef.current) {
+        // In test mode the login happens through the navbar test wallet
+        // button; never auto-open the thirdweb modal there.
+        if (status === 'disconnected' && !openedRef.current && !isTestMode()) {
             openedRef.current = true;
             openConnect();
         }

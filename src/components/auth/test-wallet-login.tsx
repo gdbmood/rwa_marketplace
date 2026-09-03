@@ -5,7 +5,7 @@ import { Box, Button, CircularProgress, Tooltip, Typography, useColorScheme } fr
 import sessionStore from "@/store/sessionStore";
 import { TEST_WALLET_CHANGED_EVENT } from "@/hooks/useActiveAccountCompat";
 import { isTestMode, loginTestWallet } from "@/lib/wallet/testAccount";
-import type { userTypes } from "@/types/Users";
+import type { Enums } from "@/types/database";
 
 /**
  * Test-mode replacement for the thirdweb ConnectButton: logs in as the local
@@ -13,7 +13,7 @@ import type { userTypes } from "@/types/Users";
  * /api/test-auth, then refreshes the client session state. Renders nothing
  * outside NEXT_PUBLIC_TEST_MODE=1.
  */
-export default function TestWalletLogin({ userType = "retail" }: { userType?: userTypes }) {
+export default function TestWalletLogin({ userType = "retail" }: { userType?: Enums<'user_type'> }) {
     const user = sessionStore((state) => state.user);
     const refresh = sessionStore((state) => state.refresh);
     const doLogout = sessionStore((state) => state.logout);

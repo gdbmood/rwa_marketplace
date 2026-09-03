@@ -1,6 +1,6 @@
 import { getAssetDetail } from '@/actions/assets';
 import { requireUser } from '@/lib/auth/session';
-import { getApprovedKycForUser } from '@/lib/sumsub/kyc';
+import { getApprovedKycForUser } from '@/lib/db/kyc';
 import { createServiceClient } from '@/lib/supabase/server';
 import { unwrap } from '@/lib/db/helpers';
 import AssetDetailView, {
@@ -21,16 +21,23 @@ interface AssetPageProps {
   params: Promise<{ saleId: string }>;
 }
 
-async function getViewerState(kycRequired: boolean): Promise<ViewerState> {
+async function getViewerState(
+  kycRequired: boolean,
+  businessId: string | null,
+): Promise<ViewerState> {
   try {
     const { user } = await requireUser();
     let kycApproved = user.is_verified;
     if (kycRequired && !kycApproved) {
       kycApproved = Boolean(await getApprovedKycForUser(user.id));
     }
-    return { loggedIn: true, kycApproved };
+    return {
+      loggedIn: true,
+      kycApproved,
+      isOwner: businessId !== null && user.id === businessId,
+    };
   } catch {
-    return { loggedIn: false, kycApproved: false };
+    return { loggedIn: false, kycApproved: false, isOwner: false };
   }
 }
 
@@ -56,7 +63,7 @@ export default async function AssetPage({ params }: AssetPageProps) {
 
   const { asset, listings } = detail.data;
   const [viewer, sellers] = await Promise.all([
-    getViewerState(Boolean(asset.kyc_required)),
+    getViewerState(Boolean(asset.kyc_required), asset.business_id),
     getSellerNames(Array.from(new Set(listings.map((listing) => listing.lister_id)))).catch(
       (error) => {
         console.error('[asset.page] seller name lookup failed', error);

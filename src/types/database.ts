@@ -315,6 +315,30 @@ export type Database = {
           },
         ]
       }
+      indexer_cursors: {
+        Row: {
+          chain_id: number
+          contract_address: string
+          created_at: string
+          last_block: number
+          updated_at: string | null
+        }
+        Insert: {
+          chain_id: number
+          contract_address: string
+          created_at?: string
+          last_block?: number
+          updated_at?: string | null
+        }
+        Update: {
+          chain_id?: number
+          contract_address?: string
+          created_at?: string
+          last_block?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       kyc_identities: {
         Row: {
           created_at: string

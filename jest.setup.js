@@ -53,23 +53,6 @@ jest.mock('next/image', () => {
     }
 })
 
-// Mock Firebase (using compat mode which the app actually uses)
-jest.mock('firebase/compat/app', () => ({
-    __esModule: true,
-    default: {
-        initializeApp: jest.fn(),
-        apps: [],
-        firestore: {
-            FieldValue: {
-                increment: jest.fn((value) => `increment(${value})`),
-            },
-        },
-    },
-}))
-
-jest.mock('firebase/compat/firestore', () => ({}))
-jest.mock('firebase/compat/storage', () => ({}))
-
 // Mock thirdweb
 jest.mock('thirdweb', () => ({
     createThirdwebClient: jest.fn(),

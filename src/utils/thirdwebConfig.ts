@@ -2,7 +2,7 @@ import { generatePayload, isLoggedIn, login, logout } from "@/actions/login";
 import { VerifyLoginPayloadParams } from "thirdweb/auth";
 import { inAppWallet } from "thirdweb/wallets";
 import { chain, client } from '@/lib/thirdWebClient';
-import { userTypes } from "@/types/Users";
+import type { Enums } from "@/types/database";
 import sessionStore from "@/store/sessionStore";
 
 /**
@@ -14,7 +14,7 @@ import sessionStore from "@/store/sessionStore";
  * business user connecting through the shared navbar is registered as
  * business (see docs/audit/frontend.md section 3.3).
  */
-export const connectWalletConfig = (userType: userTypes = 'retail') => {
+export const connectWalletConfig = (userType: Enums<'user_type'> = 'retail') => {
     const wallets = [
         inAppWallet({
             auth: {
