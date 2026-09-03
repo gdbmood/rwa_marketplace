@@ -80,6 +80,17 @@ interface PlaywrightJsonSuite {
   }>;
 }
 
+/**
+ * Tests that are scaffolding rather than product functions. They either open
+ * no page at all (so Playwright saves no video) or they exist only to prepare
+ * chain state, and a viewer would learn nothing from them.
+ */
+const EXCLUDED_TITLES = [/^00 setup\b/i, /stale-chain guard/i, /harness/i, /reconcile/i];
+
+function isExcluded(title: string, file: string): boolean {
+  return EXCLUDED_TITLES.some((pattern) => pattern.test(title) || pattern.test(file));
+}
+
 function slugify(title: string): string {
   return title
     .toLowerCase()
@@ -106,6 +117,9 @@ function collect(suite: PlaywrightJsonSuite, file: string, into: DemoEntry[]): v
   const currentFile = suite.file ?? file;
   for (const spec of suite.specs ?? []) {
     const title = spec.title ?? 'untitled';
+    if (isExcluded(title, currentFile)) {
+      continue;
+    }
     for (const test of spec.tests ?? []) {
       for (const result of test.results ?? []) {
         const video = (result.attachments ?? []).find(

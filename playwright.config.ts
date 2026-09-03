@@ -52,7 +52,10 @@ export default defineConfig({
     {
       name: 'suites',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: /reconcile\.spec\.ts/,
+      // 99-full-journey is the demo walkthrough: it re-covers ground the
+      // focused specs already assert, so the normal suite skips it and only
+      // playwright.demo.config.ts records it.
+      testIgnore: [/reconcile\.spec\.ts/, /\.demo\.spec\.ts/],
     },
     {
       name: 'reconcile',

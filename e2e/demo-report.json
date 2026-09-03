@@ -1,0 +1,945 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.6.1/bin/node",
+      "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "playwright.demo.config.ts",
+      "--list"
+    ],
+    "configFile": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/playwright.demo.config.ts",
+    "rootDir": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/e2e/specs",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/e2e/global-setup.ts",
+    "globalTeardown": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/e2e/global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "",
+        "name": "",
+        "testDir": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/e2e/specs",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "e2e/demo-report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npx tsx e2e/start-web.ts",
+      "port": 3100,
+      "reuseExistingServer": true,
+      "timeout": 480000,
+      "stdout": "pipe",
+      "stderr": "pipe"
+    }
+  },
+  "suites": [
+    {
+      "title": "00-harness.smoke.spec.ts",
+      "file": "00-harness.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "e2e harness",
+          "file": "00-harness.smoke.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "local chain is up with the deployed marketplace",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7ed207b82ffc909a7f7b-4c5c41b3ca051d71f10f",
+              "file": "00-harness.smoke.spec.ts",
+              "line": 10,
+              "column": 7
+            },
+            {
+              "title": "app is serving and test-auth issues a session",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7ed207b82ffc909a7f7b-6855ac86ac8f68ee140b",
+              "file": "00-harness.smoke.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "signed sumsub webhook flips verification",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7ed207b82ffc909a7f7b-8d585c70bbd9f31f7513",
+              "file": "00-harness.smoke.spec.ts",
+              "line": 34,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "99-full-journey.demo.spec.ts",
+      "file": "99-full-journey.demo.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "full journey walkthrough",
+          "file": "99-full-journey.demo.spec.ts",
+          "line": 45,
+          "column": 6,
+          "specs": [
+            {
+              "title": "business lists an asset, an investor buys with a card and resells, a second investor buys the resale",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "06f6b2cb68080678d703-cc31804ab0b56a600b2e",
+              "file": "99-full-journey.demo.spec.ts",
+              "line": 46,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "business.spec.ts",
+      "file": "business.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "business journey",
+          "file": "business.spec.ts",
+          "line": 75,
+          "column": 15,
+          "specs": [
+            {
+              "title": "registers on first login and lands behind the verification gate",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-e6212e5b1c30d39970e2",
+              "file": "business.spec.ts",
+              "line": 76,
+              "column": 7
+            },
+            {
+              "title": "completes the business profile",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-f414bc4a5d6cad2ea62f",
+              "file": "business.spec.ts",
+              "line": 108,
+              "column": 7
+            },
+            {
+              "title": "is verified through the signed Sumsub webhook",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-e660c0b52c4ead5b4d81",
+              "file": "business.spec.ts",
+              "line": 144,
+              "column": 7
+            },
+            {
+              "title": "rejects an invalid listing form with validation messages",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-29d695a53a2665f087a1",
+              "file": "business.spec.ts",
+              "line": 167,
+              "column": 7
+            },
+            {
+              "title": "creates a draft listing with per-class fields, image and document",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-b082c99c94d948b99a0d",
+              "file": "business.spec.ts",
+              "line": 186,
+              "column": 7
+            },
+            {
+              "title": "edits the draft and shows the Coming soon card in the marketplace",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-85d6867d4701a8bfa3d4",
+              "file": "business.spec.ts",
+              "line": 262,
+              "column": 7
+            },
+            {
+              "title": "mints and lists the asset on the local chain",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-7b087a854e40da3467a5",
+              "file": "business.spec.ts",
+              "line": 313,
+              "column": 7
+            },
+            {
+              "title": "shows the asset with the sales view on the dashboard",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-bc5c1c112f9cd3ce3977",
+              "file": "business.spec.ts",
+              "line": 405,
+              "column": 7
+            },
+            {
+              "title": "updates the listing metadata and primary price",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-ec3a5ad9cd6ab761b735",
+              "file": "business.spec.ts",
+              "line": 427,
+              "column": 7
+            },
+            {
+              "title": "delists the remaining fractions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-8d5f57251a93b8082106",
+              "file": "business.spec.ts",
+              "line": 472,
+              "column": 7
+            },
+            {
+              "title": "shows transactions and revenue on the dashboard",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-4918bcfcf2454539f4f9",
+              "file": "business.spec.ts",
+              "line": 533,
+              "column": 7
+            },
+            {
+              "title": "persists settings updates",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "66346504f81fcdf6f5e9-1085f4f662f96feafb51",
+              "file": "business.spec.ts",
+              "line": 556,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "investor.spec.ts",
+      "file": "investor.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "investor journeys",
+          "file": "investor.spec.ts",
+          "line": 81,
+          "column": 6,
+          "specs": [
+            {
+              "title": "00 setup: stale-chain guard, on-chain mint, card-fail asset",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-1284943abbde5b95d143",
+              "file": "investor.spec.ts",
+              "line": 82,
+              "column": 7
+            },
+            {
+              "title": "01 registers through test auth and completes the profile",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-2421825bcd8fd9ec0179",
+              "file": "investor.spec.ts",
+              "line": 99,
+              "column": 7
+            },
+            {
+              "title": "02 browses the marketplace with search, class and field filters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-7704caaa146fb4328426",
+              "file": "investor.spec.ts",
+              "line": 135,
+              "column": 7
+            },
+            {
+              "title": "03 opens the asset detail page and its documents",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-5febdbd232628cbb544f",
+              "file": "investor.spec.ts",
+              "line": 175,
+              "column": 7
+            },
+            {
+              "title": "04 KYC gate blocks an unverified buyer and lifts after the signed webhook",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-d0d6f50cc1b9aaa80876",
+              "file": "investor.spec.ts",
+              "line": 199,
+              "column": 7
+            },
+            {
+              "title": "05 buys with USDC: approve, buyFractions, indexer settlement, portfolio",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-b3ed3c7ea5ee78864aff",
+              "file": "investor.spec.ts",
+              "line": 241,
+              "column": 7
+            },
+            {
+              "title": "06 buys with card through the mock onramp: awaiting_funds, funded, settled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-e7636f15c1122aeebbea",
+              "file": "investor.spec.ts",
+              "line": 296,
+              "column": 7
+            },
+            {
+              "title": "07 card payment failure (magic 13) shows a clear failed state with retry",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-bc56123db1fce709a7b5",
+              "file": "investor.spec.ts",
+              "line": 355,
+              "column": 7
+            },
+            {
+              "title": "08 lists fractions for resale and the secondary listing appears",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-b52b0cbe1ce497a1ad36",
+              "file": "investor.spec.ts",
+              "line": 394,
+              "column": 7
+            },
+            {
+              "title": "09 updates the resale listing price",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-d25d8a148b5b4ed3f1c4",
+              "file": "investor.spec.ts",
+              "line": 443,
+              "column": 7
+            },
+            {
+              "title": "10 unlists the resale listing",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-94458dc6005385862870",
+              "file": "investor.spec.ts",
+              "line": 473,
+              "column": 7
+            },
+            {
+              "title": "11 transfers fractions to another user and the indexer moves balances",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-ff7f741fe617737db8b1",
+              "file": "investor.spec.ts",
+              "line": 510,
+              "column": 7
+            },
+            {
+              "title": "12 the recipient sees the transferred fractions in their portfolio",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-301713db453e4b28aacc",
+              "file": "investor.spec.ts",
+              "line": 555,
+              "column": 7
+            },
+            {
+              "title": "13 transaction history lists every operation of the journey",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-62981caaefc83fae5f8b",
+              "file": "investor.spec.ts",
+              "line": 576,
+              "column": 7
+            },
+            {
+              "title": "14 display currency changes the prices shown",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-44e7160bb959a7544344",
+              "file": "investor.spec.ts",
+              "line": 605,
+              "column": 7
+            },
+            {
+              "title": "15 settings preferences persist through the server action",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-1d03a52c88fef86a62a7",
+              "file": "investor.spec.ts",
+              "line": 641,
+              "column": 7
+            },
+            {
+              "title": "16 logs out and back in with state intact",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7a3264e922e3aa6fa0e4-307f8a8a2b9c3bbb562c",
+              "file": "investor.spec.ts",
+              "line": 683,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "reconcile.spec.ts",
+      "file": "reconcile.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "chain reconciliation",
+          "file": "reconcile.spec.ts",
+          "line": 48,
+          "column": 6,
+          "specs": [
+            {
+              "title": "reconcile-chain.ts exits 0 with zero unexplained diffs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "d6697156f3aa9736b021-cbfea683a97d53f15539",
+              "file": "reconcile.spec.ts",
+              "line": 49,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "system.spec.ts",
+      "file": "system.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "system guarantees",
+          "file": "system.spec.ts",
+          "line": 651,
+          "column": 15,
+          "specs": [
+            {
+              "title": "indexer reconciles a purchase completed while the browser was closed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "19fec53437319cd87246-59b6e206980d4e520150",
+              "file": "system.spec.ts",
+              "line": 652,
+              "column": 7
+            },
+            {
+              "title": "two concurrent buys for the last fractions settle exactly one order",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "19fec53437319cd87246-0043777445ab13bc3f74",
+              "file": "system.spec.ts",
+              "line": 791,
+              "column": 7
+            },
+            {
+              "title": "the losing buyer sees a clear failure message in the buy flow UI",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "19fec53437319cd87246-e2d48ac8340b62697e10",
+              "file": "system.spec.ts",
+              "line": 989,
+              "column": 7
+            },
+            {
+              "title": "RLS blocks cross-user holdings reads and anon sees only public data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "19fec53437319cd87246-c2fcec5a02c6f34528ce",
+              "file": "system.spec.ts",
+              "line": 1122,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-03T15:24:26.528Z",
+    "duration": 837.6289999999999,
+    "expected": 0,
+    "skipped": 38,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
