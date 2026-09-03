@@ -89,6 +89,37 @@ User decisions recorded:
   Firestore migration script is still delivered for completeness but the seed
   path is the primary route.
 
+## Phases 4 to 7: Implementation (2026-09-03, code complete)
+
+Delivered by six parallel workstreams plus integration, all green (tsc 0 errors,
+lint passing, jest 161+ tests passing, next build 15 of 15 pages):
+
+- Server actions rewritten on the repository layer with requireUser and the
+  Result contract; session cookie hardened (HttpOnly, Secure, SameSite).
+- Sumsub webhook now verifies the x-payload-digest HMAC; KYC session route uses
+  verified JWTs (decodeJwt eliminated); is_verified flips on GREEN, revokes on RED.
+- The unauthenticated purchaseSuccessOnBlockchain action is gone; settlement is
+  owned by the chain indexer (src/lib/indexer), idempotent on (tx_hash, log_index),
+  with fetchAllListings polling for primary listing truth, vercel.json crons,
+  /api/chain-webhook for thirdweb Insight, and scripts/indexer.ts for local runs.
+- scripts/reconcile-chain.ts (holdings vs balanceOf, primary listings vs
+  fetchAllListings), scripts/seed.ts (deterministic, idempotent),
+  scripts/migrate-firestore-to-supabase.ts (dry run capable, delivered although
+  the user chose recreate from zero).
+- On-ramp behind an OnrampProvider interface: thirdweb Bridge.Onramp primary,
+  mock provider for test mode, Transak stub. IMPORTANT research finding recorded
+  in docs/architecture/ONRAMP.md: thirdweb's payments FAQ lists the UAE as an
+  unsupported region, while Transak advertises UAE and AED support. Going live
+  for UAE users likely requires implementing the Transak provider (interface is
+  ready, stub in src/lib/onramp/transak.ts).
+- Frontend fully off Firebase (packages removed): drafts and Coming soon cards,
+  buy flow with USDC and card tabs and full order state machine UI, business
+  dashboard sales view, portfolio, transfer, KYC gating, loading, empty and
+  error states, all inside the existing MUI theme.
+- Firebase deleted: firebaseClient.ts, firebaseServer.ts, firebase, firebase-admin,
+  react-firebase-hooks all removed; eslint reinstated and passing.
+- Migration 8 (indexer_cursors) applied; generated types refreshed.
+
 Credentials still needed from the user (requested, not yet supplied):
 - SUPABASE_SERVICE_ROLE_KEY and SUPABASE_JWT_SECRET (dashboard, project settings).
 - NEXT_PUBLIC_THIRDWEB_CLIENT_ID and THIRDWEB_SECRET_KEY (thirdweb dashboard).
