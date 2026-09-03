@@ -40,7 +40,14 @@ const VALUATION = '4000';
 const FRACTIONS = '100';
 const FRACTIONS_COUNT = 100;
 const MINT_PRICE = 40;
-const RESALE_PRICE = '55';
+/**
+ * The resale undercuts the primary listing on purpose. Orders are filled
+ * cheapest first across both listing kinds, so a resale priced above the
+ * primary would simply never fill while primary supply remains, and the
+ * walkthrough would show nothing. Undercutting also demonstrates the fill
+ * ordering: the second investor's order takes the secondary listing first.
+ */
+const RESALE_PRICE = '35';
 
 test.describe('full journey walkthrough', () => {
   test('business lists an asset, an investor buys with a card and resells, a second investor buys the resale', async ({
@@ -294,7 +301,8 @@ test.describe('full journey walkthrough', () => {
       expect(result.error).toBeNull();
       const row = result.data;
       return row && (row.status === 'filled' || row.quantity === 0) ? row : null;
-    });
+      // 60s: this waits on chain confirmation plus the indexer's poll cycle.
+    }, { timeoutMs: 60_000 });
 
     const buyerHolding = await pollUntil("the second investor's holding", async () => {
       const result = await database
@@ -305,7 +313,7 @@ test.describe('full journey walkthrough', () => {
         .maybeSingle();
       expect(result.error).toBeNull();
       return result.data && result.data.quantity > 0 ? result.data : null;
-    });
+    }, { timeoutMs: 60_000 });
     expect(buyerHolding.quantity).toBeGreaterThanOrEqual(1);
 
     await investorBPage.getByRole('button', { name: 'Go to portfolio' }).click();
