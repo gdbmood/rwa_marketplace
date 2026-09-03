@@ -7,6 +7,11 @@
  *         docs/demos/INDEX.md listing every video with a short description
  *         and its duration.
  *
+ * Record the FULL set before converting. Playwright rewrites the report and
+ * clears its output directory on every run, so converting after a run that was
+ * filtered to one spec (with a path argument or --grep) produces an index that
+ * lists only that spec. Always `npm run demos`, which does both in order.
+ *
  * Usage:
  *   npx tsx scripts/make-demos.ts            convert and write the index
  *   npx tsx scripts/make-demos.ts --upload   also upload to Supabase Storage
@@ -297,6 +302,12 @@ async function main(): Promise<void> {
     'actions slowed to about 400 ms. Every clip runs from the first click to the',
     'confirmed result, including the on chain confirmation and the updated',
     'database state as the UI shows it.',
+    '',
+    'Two things in the frame come from test mode and do not exist in production:',
+    'the "Log out test wallet" button in the header (the suite signs with a local',
+    'key instead of the thirdweb in-app wallet) and the mock payment provider page',
+    'in the card flow (production uses Transak). Everything else, including the',
+    'on-chain transactions and the indexer settling them, is real.',
     '',
     `Recorded set: ${rows.length} videos, ${totalMb} MB total.`,
     '',

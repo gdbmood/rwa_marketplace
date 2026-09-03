@@ -52,7 +52,6 @@ const RESALE_PRICE = '35';
 test.describe('full journey walkthrough', () => {
   test('business lists an asset, an investor buys with a card and resells, a second investor buys the resale', async ({
     page,
-    context,
     db,
     loginAs,
     sumsubApprove,
@@ -185,11 +184,11 @@ test.describe('full journey walkthrough', () => {
 
     // ---- 2. Investor A buys with a card through the on-ramp ----------------
 
-    // A fresh browser context per actor: separate session cookie and separate
-    // test-mode signer key, exactly like two different people.
-    const investorAContext = await context.browser()!.newContext();
-    const investorAPage = await investorAContext.newPage();
-    const investorAWallet = await loginAs(investorAPage, 'investor2');
+    // The same browser, re-authenticated as the investor: loginAs replaces the
+    // session cookie and the test-mode signer key, so the identity switches in
+    // place. One context means Playwright records ONE continuous video for the
+    // whole walkthrough instead of one clip per actor.
+    const investorAWallet = await loginAs(page, 'investor2');
     const investorA = (await database
       .from('users')
       .select('*')
@@ -198,21 +197,21 @@ test.describe('full journey walkthrough', () => {
       .then((r) => r.data))!;
     expect(investorA, 'investor2 must be seeded').toBeTruthy();
 
-    await investorAPage.goto(mainUrl('/marketplace'));
-    await investorAPage.getByPlaceholder('Search for assets').fill(ASSET_NAME);
-    const buyableCard = investorAPage
+    await page.goto(mainUrl('/marketplace'));
+    await page.getByPlaceholder('Search for assets').fill(ASSET_NAME);
+    const buyableCard = page
       .getByTestId('marketplace-asset-card')
       .filter({ hasText: ASSET_NAME });
     await expect(buyableCard).toBeVisible({ timeout: 30_000 });
     await expect(buyableCard.getByText('per fraction')).toBeVisible();
 
-    await investorAPage.goto(mainUrl(`/asset/${assetId}/buy/2`));
-    await investorAPage.getByRole('tab', { name: 'Card' }).click();
+    await page.goto(mainUrl(`/asset/${assetId}/buy/2`));
+    await page.getByRole('tab', { name: 'Card' }).click();
 
-    const popupPromise = investorAContext.waitForEvent('page');
-    await investorAPage.getByRole('button', { name: 'Pay with card' }).click();
+    const popupPromise = page.context().waitForEvent('page');
+    await page.getByRole('button', { name: 'Pay with card' }).click();
     await expect(
-      investorAPage.getByText('Complete the payment in the provider tab.'),
+      page.getByText('Complete the payment in the provider tab.'),
     ).toBeVisible({ timeout: 60_000 });
 
     const providerTab = await popupPromise;
@@ -223,22 +222,22 @@ test.describe('full journey walkthrough', () => {
     await providerTab.close();
 
     // Funded, then the on-chain purchase runs and the indexer settles it.
-    await expect(investorAPage.getByText('Purchase complete')).toBeVisible({
+    await expect(page.getByText('Purchase complete')).toBeVisible({
       timeout: 180_000,
     });
 
-    await investorAPage.getByRole('button', { name: 'Go to portfolio' }).click();
-    await investorAPage.waitForURL('**/portfolio');
+    await page.getByRole('button', { name: 'Go to portfolio' }).click();
+    await page.waitForURL('**/portfolio');
     await expect(
-      investorAPage.getByTestId('portfolio-holding').first().or(
-        investorAPage.getByText('No fractions yet'),
+      page.getByTestId('portfolio-holding').first().or(
+        page.getByText('No fractions yet'),
       ),
     ).toBeVisible({ timeout: 30_000 });
-    const viewMoreA = investorAPage.getByRole('button', { name: 'View More' });
+    const viewMoreA = page.getByRole('button', { name: 'View More' });
     for (let i = 0; i < 30 && (await viewMoreA.isVisible()); i += 1) {
       await viewMoreA.click();
     }
-    const holdingCard = investorAPage
+    const holdingCard = page
       .getByTestId('portfolio-holding')
       .filter({ hasText: ASSET_NAME });
     await expect(holdingCard).toHaveCount(1, { timeout: 30_000 });
@@ -246,7 +245,7 @@ test.describe('full journey walkthrough', () => {
     // ---- 3. Investor A lists one fraction for resale ------------------------
 
     await holdingCard.getByRole('button', { name: 'Sell', exact: true }).click();
-    const sellDialog = investorAPage.getByRole('dialog');
+    const sellDialog = page.getByRole('dialog');
     await expect(sellDialog.getByText('Sell fractions')).toBeVisible();
     await sellDialog.getByLabel('Price per fraction (USDC)').fill(RESALE_PRICE);
     await sellDialog.getByRole('button', { name: 'List for sale' }).click();
@@ -269,9 +268,7 @@ test.describe('full journey walkthrough', () => {
 
     // ---- 4. Investor B buys the resale -------------------------------------
 
-    const investorBContext = await context.browser()!.newContext();
-    const investorBPage = await investorBContext.newPage();
-    const investorBWallet = await loginAs(investorBPage, 'investor3');
+    const investorBWallet = await loginAs(page, 'investor3');
     const investorB = (await database
       .from('users')
       .select('*')
@@ -281,13 +278,13 @@ test.describe('full journey walkthrough', () => {
     expect(investorB, 'investor3 must be seeded').toBeTruthy();
 
     // The asset page shows the resale row alongside the primary listing.
-    await investorBPage.goto(mainUrl(`/asset/${assetId}`));
-    const resaleRow = investorBPage.getByRole('row').filter({ hasText: 'Resale' });
+    await page.goto(mainUrl(`/asset/${assetId}`));
+    const resaleRow = page.getByRole('row').filter({ hasText: 'Resale' });
     await expect(resaleRow.first()).toBeVisible({ timeout: 30_000 });
 
-    await investorBPage.goto(mainUrl(`/asset/${assetId}/buy/1`));
-    await investorBPage.getByRole('button', { name: 'Buy with USDC' }).click();
-    await expect(investorBPage.getByText('Purchase complete')).toBeVisible({
+    await page.goto(mainUrl(`/asset/${assetId}/buy/1`));
+    await page.getByRole('button', { name: 'Buy with USDC' }).click();
+    await expect(page.getByText('Purchase complete')).toBeVisible({
       timeout: 180_000,
     });
 
@@ -316,15 +313,13 @@ test.describe('full journey walkthrough', () => {
     }, { timeoutMs: 60_000 });
     expect(buyerHolding.quantity).toBeGreaterThanOrEqual(1);
 
-    await investorBPage.getByRole('button', { name: 'Go to portfolio' }).click();
-    await investorBPage.waitForURL('**/portfolio');
+    await page.getByRole('button', { name: 'Go to portfolio' }).click();
+    await page.waitForURL('**/portfolio');
     await expect(
-      investorBPage.getByTestId('portfolio-holding').first().or(
-        investorBPage.getByText('No fractions yet'),
+      page.getByTestId('portfolio-holding').first().or(
+        page.getByText('No fractions yet'),
       ),
     ).toBeVisible({ timeout: 30_000 });
 
-    await investorAContext.close();
-    await investorBContext.close();
   });
 });

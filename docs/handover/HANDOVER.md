@@ -145,51 +145,51 @@ Every function from the release checklist, both roles. Status reflects the state
 
 | # | Function | Status | Demo |
 |---|---|---|---|
-| 1 | Register | Implemented | VIDEO_LINK_PENDING |
-| 2 | Complete profile | Implemented | VIDEO_LINK_PENDING |
-| 3 | Sumsub KYB verification, webhook flips is_verified | Implemented | VIDEO_LINK_PENDING |
-| 4 | Create draft listing | Implemented | VIDEO_LINK_PENDING |
-| 5 | Edit draft listing | Implemented | VIDEO_LINK_PENDING |
-| 6 | Upload images and documents | Implemented | VIDEO_LINK_PENDING |
-| 7 | Mint and list (primary listing) | Implemented | VIDEO_LINK_PENDING |
-| 8 | Dashboard with own assets, listings, sales and buyers | Implemented | VIDEO_LINK_PENDING |
-| 9 | Update listing metadata | Implemented | VIDEO_LINK_PENDING |
-| 10 | Update primary price | Implemented | VIDEO_LINK_PENDING |
-| 11 | Delist remaining fractions | Implemented | VIDEO_LINK_PENDING |
-| 12 | See transactions and revenue | Implemented | VIDEO_LINK_PENDING |
-| 13 | Settings | Implemented | VIDEO_LINK_PENDING |
+| 1 | Register | Implemented | [08-business-registers-on-first-login-and-lands-behind-the-verification-g.mp4](../demos/08-business-registers-on-first-login-and-lands-behind-the-verification-g.mp4) |
+| 2 | Complete profile | Implemented | [01-business-completes-the-business-profile.mp4](../demos/01-business-completes-the-business-profile.mp4) |
+| 3 | Sumsub KYB verification, webhook flips is_verified | Implemented | [05-business-is-verified-through-the-signed-sumsub-webhook.mp4](../demos/05-business-is-verified-through-the-signed-sumsub-webhook.mp4) |
+| 4 | Create draft listing | Implemented | [02-business-creates-a-draft-listing-with-per-class-fields-image-and-docu.mp4](../demos/02-business-creates-a-draft-listing-with-per-class-fields-image-and-docu.mp4) |
+| 5 | Edit draft listing | Implemented | [04-business-edits-the-draft-and-shows-the-coming-soon-card-in-the-market.mp4](../demos/04-business-edits-the-draft-and-shows-the-coming-soon-card-in-the-market.mp4) |
+| 6 | Upload images and documents | Implemented | [02-business-creates-a-draft-listing-with-per-class-fields-image-and-docu.mp4](../demos/02-business-creates-a-draft-listing-with-per-class-fields-image-and-docu.mp4) |
+| 7 | Mint and list (primary listing) | Implemented | [06-business-mints-and-lists-the-asset-on-the-local-chain.mp4](../demos/06-business-mints-and-lists-the-asset-on-the-local-chain.mp4) |
+| 8 | Dashboard with own assets, listings, sales and buyers | Implemented | [10-business-shows-the-asset-with-the-sales-view-on-the-dashboard.mp4](../demos/10-business-shows-the-asset-with-the-sales-view-on-the-dashboard.mp4) |
+| 9 | Update listing metadata | Implemented | [12-business-updates-the-listing-metadata-and-primary-price.mp4](../demos/12-business-updates-the-listing-metadata-and-primary-price.mp4) |
+| 10 | Update primary price | Implemented | [12-business-updates-the-listing-metadata-and-primary-price.mp4](../demos/12-business-updates-the-listing-metadata-and-primary-price.mp4) |
+| 11 | Delist remaining fractions | Implemented | [03-business-delists-the-remaining-fractions.mp4](../demos/03-business-delists-the-remaining-fractions.mp4) |
+| 12 | See transactions and revenue | Implemented | [11-business-shows-transactions-and-revenue-on-the-dashboard.mp4](../demos/11-business-shows-transactions-and-revenue-on-the-dashboard.mp4) |
+| 13 | Settings | Implemented | [07-business-persists-settings-updates.mp4](../demos/07-business-persists-settings-updates.mp4) |
 
 ### Investor functions
 
 | # | Function | Status | Demo |
 |---|---|---|---|
-| 1 | Register | Implemented | VIDEO_LINK_PENDING |
-| 2 | Complete profile | Implemented | VIDEO_LINK_PENDING |
-| 3 | Optional Sumsub KYC verification | Implemented | VIDEO_LINK_PENDING |
-| 4 | Browse marketplace | Implemented | VIDEO_LINK_PENDING |
-| 5 | Filter by class and per-class fields | Implemented | VIDEO_LINK_PENDING |
-| 6 | View asset and documents | Implemented | VIDEO_LINK_PENDING |
-| 7 | Buy with USDC | Implemented | VIDEO_LINK_PENDING |
+| 1 | Register | Implemented | [13-investor-registers-through-test-auth-and-completes-the-profile.mp4](../demos/13-investor-registers-through-test-auth-and-completes-the-profile.mp4) |
+| 2 | Complete profile | Implemented | [13-investor-registers-through-test-auth-and-completes-the-profile.mp4](../demos/13-investor-registers-through-test-auth-and-completes-the-profile.mp4) |
+| 3 | Optional Sumsub KYC verification | Implemented | [16-investor-kyc-gate-blocks-an-unverified-buyer-and-lifts-after-the-sign.mp4](../demos/16-investor-kyc-gate-blocks-an-unverified-buyer-and-lifts-after-the-sign.mp4) |
+| 4 | Browse marketplace | Implemented | [14-investor-browses-the-marketplace-with-search-class-and-field-filters.mp4](../demos/14-investor-browses-the-marketplace-with-search-class-and-field-filters.mp4) |
+| 5 | Filter by class and per-class fields | Implemented | [14-investor-browses-the-marketplace-with-search-class-and-field-filters.mp4](../demos/14-investor-browses-the-marketplace-with-search-class-and-field-filters.mp4) |
+| 6 | View asset and documents | Implemented | [15-investor-opens-the-asset-detail-page-and-its-documents.mp4](../demos/15-investor-opens-the-asset-detail-page-and-its-documents.mp4) |
+| 7 | Buy with USDC | Implemented | [17-investor-buys-with-usdc.mp4](../demos/17-investor-buys-with-usdc.mp4) |
 | 8 | Buy with another token via swap | NOT implemented, see section 9 item 10. The tab is present and states clearly that it is coming soon. | none |
-| 9 | Buy with card via on-ramp | Implemented; production activation needs Transak partner credentials (section 9) | VIDEO_LINK_PENDING |
-| 10 | KYC-gated asset blocked when unverified, allowed when verified | Implemented | VIDEO_LINK_PENDING |
-| 11 | Portfolio with holdings and average entry price | Implemented | VIDEO_LINK_PENDING |
-| 12 | List fractions for sale (resale) | Implemented | VIDEO_LINK_PENDING |
-| 13 | Update resale listing price | Implemented | VIDEO_LINK_PENDING |
-| 14 | Unlist | Implemented | VIDEO_LINK_PENDING |
-| 15 | Transfer fractions to another user | Implemented | VIDEO_LINK_PENDING |
-| 16 | Transaction history | Implemented | VIDEO_LINK_PENDING |
-| 17 | Settings | Implemented | VIDEO_LINK_PENDING |
-| 18 | Display currency conversion | Implemented | VIDEO_LINK_PENDING |
-| 19 | Logout and login again with state intact | Implemented | VIDEO_LINK_PENDING |
+| 9 | Buy with card via on-ramp | Implemented; production activation needs Transak partner credentials (section 9) | [18-investor-buys-with-card-through-the-mock-onramp.mp4](../demos/18-investor-buys-with-card-through-the-mock-onramp.mp4) |
+| 10 | KYC-gated asset blocked when unverified, allowed when verified | Implemented | [16-investor-kyc-gate-blocks-an-unverified-buyer-and-lifts-after-the-sign.mp4](../demos/16-investor-kyc-gate-blocks-an-unverified-buyer-and-lifts-after-the-sign.mp4) |
+| 11 | Portfolio with holdings and average entry price | Implemented | [17-investor-buys-with-usdc.mp4](../demos/17-investor-buys-with-usdc.mp4) |
+| 12 | List fractions for sale (resale) | Implemented | [20-investor-lists-fractions-for-resale-and-the-secondary-listing-appears.mp4](../demos/20-investor-lists-fractions-for-resale-and-the-secondary-listing-appears.mp4) |
+| 13 | Update resale listing price | Implemented | [21-investor-updates-the-resale-listing-price.mp4](../demos/21-investor-updates-the-resale-listing-price.mp4) |
+| 14 | Unlist | Implemented | [22-investor-unlists-the-resale-listing.mp4](../demos/22-investor-unlists-the-resale-listing.mp4) |
+| 15 | Transfer fractions to another user | Implemented | [23-investor-transfers-fractions-to-another-user-and-the-indexer-moves-ba.mp4](../demos/23-investor-transfers-fractions-to-another-user-and-the-indexer-moves-ba.mp4) |
+| 16 | Transaction history | Implemented | [25-investor-transaction-history-lists-every-operation-of-the-journey.mp4](../demos/25-investor-transaction-history-lists-every-operation-of-the-journey.mp4) |
+| 17 | Settings | Implemented | [27-investor-settings-preferences-persist-through-the-server-action.mp4](../demos/27-investor-settings-preferences-persist-through-the-server-action.mp4) |
+| 18 | Display currency conversion | Implemented | [26-investor-display-currency-changes-the-prices-shown.mp4](../demos/26-investor-display-currency-changes-the-prices-shown.mp4) |
+| 19 | Logout and login again with state intact | Implemented | [28-investor-logs-out-and-back-in-with-state-intact.mp4](../demos/28-investor-logs-out-and-back-in-with-state-intact.mp4) |
 
 ### System guarantees
 
 | # | Guarantee | Status | Demo |
 |---|---|---|---|
-| 1 | Indexer reconciles a purchase completed while the browser was closed | Implemented, covered by e2e system spec | VIDEO_LINK_PENDING |
-| 2 | Two concurrent buyers of the last fractions: exactly one order settles, the other fails with a clear message | Implemented, covered by e2e system spec | VIDEO_LINK_PENDING |
-| 3 | RLS blocks a user from reading another user's holdings | Implemented, covered by e2e RLS spec | VIDEO_LINK_PENDING |
+| 1 | Indexer reconciles a purchase completed while the browser was closed | Implemented, covered by e2e system spec | [00-full-journey.mp4](../demos/00-full-journey.mp4) |
+| 2 | Two concurrent buyers of the last fractions: exactly one order settles, the other fails with a clear message | Implemented, covered by e2e system spec | [30-system-the-losing-buyer-sees-a-clear-failure-message-in-the-buy-flo.mp4](../demos/30-system-the-losing-buyer-sees-a-clear-failure-message-in-the-buy-flo.mp4) |
+| 3 | RLS blocks a user from reading another user's holdings | Implemented, covered by e2e RLS spec | [29-system-rls-blocks-cross-user-holdings-reads-and-anon-sees-only-publ.mp4](../demos/29-system-rls-blocks-cross-user-holdings-reads-and-anon-sees-only-publ.mp4) |
 
 ---
 

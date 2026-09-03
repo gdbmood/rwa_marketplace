@@ -5,8 +5,7 @@
       "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/node_modules/.bin/playwright",
       "test",
       "--config",
-      "playwright.demo.config.ts",
-      "--list"
+      "playwright.demo.config.ts"
     ],
     "configFile": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/playwright.demo.config.ts",
     "rootDir": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/e2e/specs",
@@ -19,14 +18,18 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 1
+    },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "",
         "name": "",
         "testDir": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/e2e/specs",
@@ -94,8 +97,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:38:22.663Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7ed207b82ffc909a7f7b-4c5c41b3ca051d71f10f",
@@ -114,8 +131,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1082,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:38:22.689Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/00-harness.smoke-e2e-harne-71ed3--test-auth-issues-a-session/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7ed207b82ffc909a7f7b-6855ac86ac8f68ee140b",
@@ -134,8 +171,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 506,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:38:24.019Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7ed207b82ffc909a7f7b-8d585c70bbd9f31f7513",
@@ -157,7 +208,7 @@
         {
           "title": "full journey walkthrough",
           "file": "99-full-journey.demo.spec.ts",
-          "line": 45,
+          "line": 52,
           "column": 6,
           "specs": [
             {
@@ -166,18 +217,43 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 900000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 39192,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:38:24.534Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/99-full-journey.demo-full--f2411-nd-investor-buys-the-resale/video-1.webm"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/99-full-journey.demo-full--f2411-nd-investor-buys-the-resale/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "06f6b2cb68080678d703-cc31804ab0b56a600b2e",
               "file": "99-full-journey.demo.spec.ts",
-              "line": 46,
+              "line": 53,
               "column": 7
             }
           ]
@@ -208,8 +284,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2123,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:03.752Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--561c6-ehind-the-verification-gate/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-e6212e5b1c30d39970e2",
@@ -228,8 +324,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4827,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:05.882Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey-completes-the-business-profile/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-f414bc4a5d6cad2ea62f",
@@ -248,8 +364,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2931,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:10.713Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--76030-h-the-signed-Sumsub-webhook/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-e660c0b52c4ead5b4d81",
@@ -268,8 +404,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2009,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:13.652Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--efbe0-rm-with-validation-messages/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-29d695a53a2665f087a1",
@@ -288,8 +444,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7334,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:15.665Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--16247-s-fields-image-and-document/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-b082c99c94d948b99a0d",
@@ -308,8 +484,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3712,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:23.002Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--11cbd-oon-card-in-the-marketplace/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-85d6867d4701a8bfa3d4",
@@ -323,13 +519,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 240000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8743,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:26.718Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--70b25-he-asset-on-the-local-chain/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-7b087a854e40da3467a5",
@@ -348,8 +564,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 899,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:35.466Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--72262-sales-view-on-the-dashboard/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-bc5c1c112f9cd3ce3977",
@@ -363,13 +599,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 150000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2205,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:36.376Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--fd08d--metadata-and-primary-price/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-ec3a5ad9cd6ab761b735",
@@ -383,13 +639,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 150000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2523,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:38.593Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey-delists-the-remaining-fractions/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-8d5f57251a93b8082106",
@@ -408,8 +684,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 775,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:41.123Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey--e231f-nd-revenue-on-the-dashboard/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-4918bcfcf2454539f4f9",
@@ -428,8 +724,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2567,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:41.902Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/business-business-journey-persists-settings-updates/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "66346504f81fcdf6f5e9-1085f4f662f96feafb51",
@@ -460,13 +776,40 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 240000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3409,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[investor-spec] draft asset created 1fc3d96a-86da-4e43-948e-f2ab16b92b6b (E2E Falcon mtloy0bj)\n"
+                        },
+                        {
+                          "text": "[investor-spec] mint transaction sent 0x0980c0708d5cf389f0802848082b7ec8ea22fd16d9aaa4410b7621372a9cd069\n"
+                        },
+                        {
+                          "text": "[investor-spec] asset active (nft 2), marketplace allowance granted\n"
+                        },
+                        {
+                          "text": "[investor-spec] card-fail asset ready c37fe939-1f59-47ea-b784-a2c40d2c8eb4 (E2E Card Fail mtloy0bj)\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:45.058Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-1284943abbde5b95d143",
@@ -485,8 +828,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3001,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:48.475Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-d5fb5-h-and-completes-the-profile/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-2421825bcd8fd9ec0179",
@@ -505,8 +868,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5249,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:51.483Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-fd09a-rch-class-and-field-filters/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-7704caaa146fb4328426",
@@ -525,8 +908,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1792,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:56.740Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-a07b5-tail-page-and-its-documents/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-5febdbd232628cbb544f",
@@ -545,8 +948,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3181,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:39:58.538Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-567d5-ts-after-the-signed-webhook/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-d0d6f50cc1b9aaa80876",
@@ -560,13 +983,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 180000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9564,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:40:01.725Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-0685f-ndexer-settlement-portfolio/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-b3ed3c7ea5ee78864aff",
@@ -580,13 +1023,38 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 180000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11396,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:40:11.297Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-e02dd-aiting-funds-funded-settled/video-1.webm"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-e02dd-aiting-funds-funded-settled/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-e7636f15c1122aeebbea",
@@ -600,13 +1068,38 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 180000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11589,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:40:22.699Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-099e7-ear-failed-state-with-retry/video-1.webm"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-099e7-ear-failed-state-with-retry/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-bc56123db1fce709a7b5",
@@ -620,13 +1113,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 180000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7590,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:40:34.296Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-e6c66-e-secondary-listing-appears/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-b52b0cbe1ce497a1ad36",
@@ -640,13 +1153,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 180000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6754,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:40:41.893Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-9b07e-es-the-resale-listing-price/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-d25d8a148b5b4ed3f1c4",
@@ -660,13 +1193,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 180000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6782,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:40:48.653Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-10-unlists-the-resale-listing/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-94458dc6005385862870",
@@ -680,13 +1233,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 180000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7643,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:40:55.439Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-66cf2--the-indexer-moves-balances/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-ff7f741fe617737db8b1",
@@ -705,8 +1278,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2931,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:03.088Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-1a673-ractions-in-their-portfolio/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-301713db453e4b28aacc",
@@ -725,8 +1318,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1727,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:06.025Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-3fc88-ry-operation-of-the-journey/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-62981caaefc83fae5f8b",
@@ -745,8 +1358,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10190,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:07.760Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-cf669-cy-changes-the-prices-shown/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-44e7160bb959a7544344",
@@ -765,8 +1398,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2211,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:17.956Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-f2ac2-t-through-the-server-action/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-1d03a52c88fef86a62a7",
@@ -785,8 +1438,28 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6735,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:20.173Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/investor-investor-journeys-3c1e5-d-back-in-with-state-intact/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7a3264e922e3aa6fa0e4-307f8a8a2b9c3bbb562c",
@@ -817,13 +1490,27 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 240000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1994,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:26.927Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "d6697156f3aa9736b021-cbfea683a97d53f15539",
@@ -854,13 +1541,27 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 240000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12276,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:28.943Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "19fec53437319cd87246-59b6e206980d4e520150",
@@ -874,13 +1575,27 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 240000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12606,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:41.231Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "19fec53437319cd87246-0043777445ab13bc3f74",
@@ -894,13 +1609,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 240000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12726,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:41:53.849Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/system-system-guarantees-t-667a4--message-in-the-buy-flow-UI/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "19fec53437319cd87246-e2d48ac8340b62697e10",
@@ -914,13 +1649,33 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 600000,
+                  "timeout": 120000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1025,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-03T15:42:06.586Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/gdbmood/Desktop/Fractionnaire/rwa_marketplace/test-results-demos/system-system-guarantees-R-cc592--anon-sees-only-public-data/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "19fec53437319cd87246-c2fcec5a02c6f34528ce",
@@ -935,10 +1690,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-03T15:24:26.528Z",
-    "duration": 837.6289999999999,
-    "expected": 0,
-    "skipped": 38,
+    "startTime": "2026-09-03T15:37:59.659Z",
+    "duration": 253222.027,
+    "expected": 38,
+    "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   }

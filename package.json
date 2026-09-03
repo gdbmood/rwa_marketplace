@@ -19,7 +19,8 @@
     "demos:record": "playwright test --config playwright.demo.config.ts",
     "demos:convert": "tsx scripts/make-demos.ts",
     "demos": "npm run demos:record && npm run demos:convert",
-    "handover:pdf": "tsx scripts/make-handover-pdf.ts"
+    "handover:pdf": "tsx scripts/make-handover-pdf.ts",
+    "handover:links": "tsx scripts/link-demos-in-handover.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

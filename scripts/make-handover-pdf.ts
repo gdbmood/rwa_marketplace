@@ -90,6 +90,8 @@ const PRINT_CSS = `
     word-break: break-word;
   }
   th { background: #f2f3f6; font-weight: 600; }
+  /* Keep the narrow index column from wrapping "10" onto two lines. */
+  th:first-child, td:first-child { white-space: nowrap; }
   tr { break-inside: avoid; }
   blockquote {
     margin: 8pt 0;
