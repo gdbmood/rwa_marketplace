@@ -1,0 +1,948 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0x7FfF316219A036C084F0e84c251c5276e0A6f861",
+      "txHash": "0x5789edd94df77799f074a1e97c34b2a1a3e6f53bd8519fa087563c77867302df",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x27De872d3E546Db2157e516C10d9C7bDBed03Aa3",
+      "txHash": "0x459a54e937b906a83244be4884278865c17654dd79745a3b02b9e88622e232ab",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "caa16154eb26820ae482e6b5ff0ca79a920f63502fe27e8f3d42fef71f7f2d65": {
+      "address": "0x6Dc226918B9460cea5758A07E01d5735B3eF4CEA",
+      "txHash": "0xa2b7ec9e658d9660d5e5f3cf99028e4005025ef9a83239a67a49a4ea3d7bccc8",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "platformFee",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:21"
+          },
+          {
+            "label": "nftContract",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(BaseNFT)9330",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:23"
+          },
+          {
+            "label": "USDC",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IERC20)1743",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:24"
+          },
+          {
+            "label": "nfts",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_uint256,t_struct(NFTDetails)9439_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:62"
+          },
+          {
+            "label": "holderList",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:63"
+          },
+          {
+            "label": "resales",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_mapping(t_uint256,t_array(t_struct(NFTResaleDetails)9448_storage)dyn_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:64"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)73_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)13_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)191_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)255_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(NFTResaleDetails)9448_storage)dyn_storage": {
+            "label": "struct Marketplace.NFTResaleDetails[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(BaseNFT)9330": {
+            "label": "contract BaseNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IERC20)1743": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_enum(AssetClass)9421": {
+            "label": "enum Marketplace.AssetClass",
+            "members": [
+              "Cars",
+              "RealEstate",
+              "PrivateJets",
+              "Diamonds",
+              "Yachts",
+              "Horses",
+              "NFTs",
+              "Camels",
+              "IPAndBrands",
+              "Watches",
+              "Falcons",
+              "CryptoMiningFarm",
+              "CarbonCredits",
+              "RecycleOasis",
+              "Crowdfunding",
+              "FinancialDerivatives"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+            "label": "mapping(uint256 => address[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(NFTResaleDetails)9448_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct Marketplace.NFTResaleDetails[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(NFTDetails)9439_storage)": {
+            "label": "mapping(uint256 => struct Marketplace.NFTDetails)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(NFTDetails)9439_storage": {
+            "label": "struct Marketplace.NFTDetails",
+            "members": [
+              {
+                "label": "nftOwner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "nftId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "assetClass",
+                "type": "t_enum(AssetClass)9421",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "metadata",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "totalSupply",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "pricePerFraction",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "erc20TokenAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "isFractionalized",
+                "type": "t_bool",
+                "offset": 20,
+                "slot": "6"
+              }
+            ],
+            "numberOfBytes": "224"
+          },
+          "t_struct(NFTResaleDetails)9448_storage": {
+            "label": "struct Marketplace.NFTResaleDetails",
+            "members": [
+              {
+                "label": "seller",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "amountSold",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "pricePerFraction",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "ef8e4094ae377e900a1248d09ea7d5f6489cd56696aab0eb2b4cf59f7366f473": {
+      "address": "0xE5D7a37f07b780fD55989B296399f2478c8dD5ED",
+      "txHash": "0x131a5999cbbcaaf854b087507977ea590a0f127e619d812f04017c7669c91478",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "platformFee",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:21"
+          },
+          {
+            "label": "nftContract",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(BaseNFT)9330",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:23"
+          },
+          {
+            "label": "USDC",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IERC20)1743",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:24"
+          },
+          {
+            "label": "nfts",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_uint256,t_struct(NFTDetails)9439_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:62"
+          },
+          {
+            "label": "holderList",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:63"
+          },
+          {
+            "label": "resales",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_mapping(t_uint256,t_array(t_struct(NFTResaleDetails)9448_storage)dyn_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:64"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)73_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)13_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)191_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)255_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(NFTResaleDetails)9448_storage)dyn_storage": {
+            "label": "struct Marketplace.NFTResaleDetails[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(BaseNFT)9330": {
+            "label": "contract BaseNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IERC20)1743": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_enum(AssetClass)9421": {
+            "label": "enum Marketplace.AssetClass",
+            "members": [
+              "Cars",
+              "RealEstate",
+              "PrivateJets",
+              "Diamonds",
+              "Yachts",
+              "Horses",
+              "NFTs",
+              "Camels",
+              "IPAndBrands",
+              "Watches",
+              "Falcons",
+              "CryptoMiningFarm",
+              "CarbonCredits",
+              "RecycleOasis",
+              "Crowdfunding",
+              "FinancialDerivatives"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+            "label": "mapping(uint256 => address[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(NFTResaleDetails)9448_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct Marketplace.NFTResaleDetails[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(NFTDetails)9439_storage)": {
+            "label": "mapping(uint256 => struct Marketplace.NFTDetails)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(NFTDetails)9439_storage": {
+            "label": "struct Marketplace.NFTDetails",
+            "members": [
+              {
+                "label": "nftOwner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "nftId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "assetClass",
+                "type": "t_enum(AssetClass)9421",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "metadata",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "totalSupply",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "pricePerFraction",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "erc20TokenAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "isFractionalized",
+                "type": "t_bool",
+                "offset": 20,
+                "slot": "6"
+              }
+            ],
+            "numberOfBytes": "224"
+          },
+          "t_struct(NFTResaleDetails)9448_storage": {
+            "label": "struct Marketplace.NFTResaleDetails",
+            "members": [
+              {
+                "label": "seller",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "amountSold",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "pricePerFraction",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "bd94a6e57b0a65d192b739dd253027e8bbb92f411575e6a6c4709ccdbf7f9040": {
+      "address": "0x651D1c4D4Ae3e9E7E4400875C1F8703e2d4db8D1",
+      "txHash": "0xb5b5c9690ac748c37872b8d0c9e2dd8934ac8e9b7cf26fbfcdc17bf692ebb9c2",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "platformFee",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:21"
+          },
+          {
+            "label": "feeRecipient",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:22"
+          },
+          {
+            "label": "nftContract",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(BaseNFT)9330",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:24"
+          },
+          {
+            "label": "USDC",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_contract(IERC20)1743",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:25"
+          },
+          {
+            "label": "nfts",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_mapping(t_uint256,t_struct(NFTDetails)9421_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:43"
+          },
+          {
+            "label": "holderList",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:44"
+          },
+          {
+            "label": "resales",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_mapping(t_uint256,t_array(t_struct(NFTResaleDetails)9430_storage)dyn_storage)",
+            "contract": "Marketplace",
+            "src": "contracts/Marketplace.sol:45"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)73_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)13_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)191_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)255_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(NFTResaleDetails)9430_storage)dyn_storage": {
+            "label": "struct Marketplace.NFTResaleDetails[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(BaseNFT)9330": {
+            "label": "contract BaseNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IERC20)1743": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+            "label": "mapping(uint256 => address[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(NFTResaleDetails)9430_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct Marketplace.NFTResaleDetails[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(NFTDetails)9421_storage)": {
+            "label": "mapping(uint256 => struct Marketplace.NFTDetails)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(NFTDetails)9421_storage": {
+            "label": "struct Marketplace.NFTDetails",
+            "members": [
+              {
+                "label": "nftOwner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "nftId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "metadata",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "totalSupply",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "pricePerFraction",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "erc20TokenAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "isFractionalized",
+                "type": "t_bool",
+                "offset": 20,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_struct(NFTResaleDetails)9430_storage": {
+            "label": "struct Marketplace.NFTResaleDetails",
+            "members": [
+              {
+                "label": "seller",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "amountSold",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "pricePerFraction",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
