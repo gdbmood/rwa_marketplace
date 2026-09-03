@@ -1,9 +1,9 @@
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import { ThemeProvider } from '@mui/material/styles';
-import { ThirdwebProvider } from 'thirdweb/react';
 import { CssBaseline } from '@mui/material';
 import { Roboto } from "next/font/google";
+import AppProviders from '@/components/providers';
 import '../../public/css/satoshi.css';
 import type { Metadata } from "next";
 import theme from '@/theme';
@@ -35,10 +35,10 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme} defaultMode="dark">
             <CssBaseline />
-            <ThirdwebProvider>
+            <AppProviders>
               <InitColorSchemeScript attribute="class" />
               {children}
-            </ThirdwebProvider>
+            </AppProviders>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

@@ -1,10 +1,10 @@
 // src/store/__tests__/currencyStore.test.ts
 import { act } from '@testing-library/react';
 import currencyStore from '../currencyStore';
-import { currencyRate } from '@/actions/currency-rate';
+import { currencyRate } from '@/actions/currency';
 
 // Mock currency rate action
-jest.mock('@/actions/currency-rate', () => ({
+jest.mock('@/actions/currency', () => ({
     currencyRate: jest.fn(),
 }));
 
@@ -12,13 +12,17 @@ describe('currencyStore', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         // Reset store state
-        currencyStore.getState().setCurrencies({});
+        act(() => {
+            currencyStore.setState({ currencies: {}, loading: false, error: null });
+        });
     });
 
     describe('initial state', () => {
         it('should have empty currencies object initially', () => {
-            const { currencies } = currencyStore.getState();
+            const { currencies, loading, error } = currencyStore.getState();
             expect(currencies).toEqual({});
+            expect(loading).toBe(false);
+            expect(error).toBeNull();
         });
     });
 
@@ -124,20 +128,23 @@ describe('currencyStore', () => {
             expect(currencies).toEqual(emptyCurrencies);
         });
 
-        it('should handle currency rate API errors', async () => {
-            const errorMessage = 'Failed to fetch currency rates';
-            jest.mocked(currencyRate).mockRejectedValue(new Error(errorMessage));
+        it('should set the error flag on API errors instead of throwing', async () => {
+            jest.mocked(currencyRate).mockRejectedValue(new Error('API Error'));
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-            await expect(
-                act(async () => {
-                    await currencyStore.getState().fetchCurrencies();
-                })
-            ).rejects.toThrow(errorMessage);
+            const result = await act(async () => {
+                return currencyStore.getState().fetchCurrencies();
+            });
 
             expect(jest.mocked(currencyRate)).toHaveBeenCalledTimes(1);
+            expect(result).toEqual({});
+            const { error, loading } = currencyStore.getState();
+            expect(error).toBe('Could not load exchange rates');
+            expect(loading).toBe(false);
+            consoleSpy.mockRestore();
         });
 
-        it('should not modify store state on API error', async () => {
+        it('should keep previously loaded rates on API error', async () => {
             const initialCurrencies = {
                 USD: 1,
                 EUR: 0.85,
@@ -149,17 +156,16 @@ describe('currencyStore', () => {
             });
 
             jest.mocked(currencyRate).mockRejectedValue(new Error('API Error'));
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-            try {
-                await act(async () => {
-                    await currencyStore.getState().fetchCurrencies();
-                });
-            } catch (error) {
-                // Expected to throw
-            }
+            const result = await act(async () => {
+                return currencyStore.getState().fetchCurrencies();
+            });
 
+            expect(result).toEqual(initialCurrencies);
             const { currencies } = currencyStore.getState();
             expect(currencies).toEqual(initialCurrencies);
+            consoleSpy.mockRestore();
         });
 
         it('should handle different currency formats', async () => {

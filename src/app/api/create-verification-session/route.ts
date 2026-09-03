@@ -1,98 +1,51 @@
 import { NextRequest } from 'next/server';
-import FormData from 'form-data';
-import * as jose from 'jose';
-import crypto from 'crypto';
-import axios from 'axios';
+import { AuthError, requireUser } from '@/lib/auth/session';
+import {
+  SUMSUB_LEVELS,
+  SumsubApiError,
+  type SumsubLevel,
+  createSdkAccessToken,
+} from '@/lib/sumsub/client';
 
-interface JwtPayload {
-    ctx?: {
-        walletAddress?: string;
-    };
-}
-
-const SUMSUB_APP_TOKEN = process.env.SUMSUB_TOKEN!;
-const SUMSUB_SECRET_KEY = process.env.SUMSUB_SECRET_KEY!;
-const SUMSUB_BASE_URL = 'https://api.sumsub.com';
-
-var config: { baseURL?: string; method?: string; url?: string; headers?: any; data?: any } = {};
-config.baseURL = SUMSUB_BASE_URL;
-
-axios.interceptors.request.use(createSignature, function (error) {
-    return Promise.reject(error);
-})
-
-function createSignature(config: any) {
-    console.log('Creating a signature for the request...');
-
-    var ts = Math.floor(Date.now() / 1000);
-    const signature = crypto.createHmac('sha256', SUMSUB_SECRET_KEY);
-    signature.update(ts + config.method.toUpperCase() + config.url);
-
-    if (config.data instanceof FormData) {
-        signature.update(config.data.getBuffer());
-    } else if (config.data) {
-        signature.update(config.data);
-    }
-
-    config.headers['X-App-Access-Ts'] = ts;
-    config.headers['X-App-Access-Sig'] = signature.digest('hex');
-
-    return config;
-}
-
-function createAccessToken(externalUserId: string, levelName = 'basic-kyc-level', ttlInSecs = 600) {
-    console.log("Creating an access token for initializng SDK...");
-
-    var body = {
-        userId: externalUserId,
-        levelName: levelName,
-        ttlInSecs: ttlInSecs
-    };
-
-    var method = 'post';
-    var url = '/resources/accessTokens/sdk';
-
-    var headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'X-App-Token': SUMSUB_APP_TOKEN
-    };
-
-    config.method = method;
-    config.url = url;
-    config.headers = headers;
-    config.data = JSON.stringify(body);
-
-    return config;
-}
-
+/**
+ * GET /api/create-verification-session?level=id-only|id-and-liveness
+ *
+ * Mints a Sumsub WebSDK access token for the logged-in user. The session JWT
+ * is fully verified through requireUser (signature and expiry, never
+ * jose.decodeJwt), the business level is restricted to business accounts,
+ * and the external user id is the session wallet, never client input.
+ * Response shape (a JSON string containing the token) is unchanged for the
+ * existing verify pages.
+ */
 export async function GET(req: NextRequest) {
-    const sessionCookie = req.cookies.get('jwt')
-    const searchParams = req.nextUrl.searchParams
-    const level = searchParams.get('level')
+  const level = req.nextUrl.searchParams.get('level');
+  if (!level || !SUMSUB_LEVELS.includes(level as SumsubLevel)) {
+    return new Response('Level not found', { status: 400 });
+  }
 
-    if (level && ['id-only', 'id-and-liveness'].includes(level)) {
-        if (sessionCookie) {
-            const decodedJwt = jose.decodeJwt(sessionCookie.value) as JwtPayload;
-            const externalUserId = decodedJwt.ctx?.walletAddress as string;
-            if (externalUserId) {
-                try {
-                    const response = await axios.request(createAccessToken(externalUserId, level));
-                    return Response.json(response.data.token);
-                } catch (error: any) {
-                    console.error('Error creating an applicant:', error.response);
-                    return new Response('Error creating an applicant', { status: 500 });
-                }
-            }
-            else {
-                return new Response('External user ID not found', { status: 400 });
-            }
-        }
-        else {
-            return new Response('Unauthorized', { status: 401 });
-        }
+  let user;
+  let wallet;
+  try {
+    ({ user, wallet } = await requireUser());
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return new Response('Unauthorized', { status: 401 });
     }
-    else {
-        return new Response('Level not found', { status: 400 });
-    }
+    console.error('[create-verification-session] session check failed');
+    return new Response('Internal Server Error', { status: 500 });
+  }
+
+  if (level === 'id-and-liveness' && user.type !== 'business') {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  try {
+    const token = await createSdkAccessToken(wallet, level as SumsubLevel);
+    return Response.json(token);
+  } catch (error) {
+    // Log status only; the Sumsub error body can carry applicant PII.
+    const status = error instanceof SumsubApiError ? error.status : 'unknown';
+    console.error(`[create-verification-session] Sumsub token request failed (${status})`);
+    return new Response('Error creating an applicant', { status: 500 });
+  }
 }

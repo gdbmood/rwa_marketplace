@@ -1,27 +1,12 @@
-"use server";
+'use server';
 
-interface CurrencyRateResult {
-    time_next_update_unix: number;
-    conversion_rates: {
-        EUR: number;
-        AED: number;
-    }
-}
+import { type CurrencyRates, currencyRate as fetchCurrencyRates } from '@/actions/currency';
 
-let result: CurrencyRateResult | null = null;
-
-export async function currencyRate() {
-    if (!result || (result && Math.floor(Date.now() / 1000) > result.time_next_update_unix)) {
-        const req = await fetch('https://v6.exchangerate-api.com/v6/728eda2f8fc18ac492f2b410/latest/USD')
-        result = await req.json()
-    }
-
-    if (result) {
-        return {
-            "USD": 1,
-            "EUR": result.conversion_rates.EUR,
-            "AED": result.conversion_rates.AED,
-        }
-    }
-    throw new Error('Failed to fetch currency rates');
+/**
+ * Back-compat wrapper: currencyStore imports from '@/actions/currency-rate'.
+ * The implementation (env API key, validated cache) lives in
+ * src/actions/currency.ts. Point new code there.
+ */
+export async function currencyRate(): Promise<CurrencyRates> {
+  return fetchCurrencyRates();
 }

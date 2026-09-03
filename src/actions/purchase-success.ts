@@ -1,66 +1,24 @@
-"use server";
+'use server';
 
-import { initializeFirebaseAdminApp } from '@/lib/firebaseServer'
-import { getFirestore } from 'firebase-admin/firestore';
-import { Holding } from '@/types/Holding';
-import { Listing } from '@/types/Listing';
-import { Asset } from '@/types/Asset';
+import type { ActionResult } from '@/actions/result';
 
-export async function purchaseSuccessOnBlockchain(assetId: string, quantity: number) {
-    initializeFirebaseAdminApp()
-
-    const assetRef = getFirestore().collection('Asset').doc(assetId);
-    const assetDoc = await assetRef.get();
-    if (assetDoc.exists) {
-        const listingsRef = assetRef.collection('Listing');
-        let listings = await listingsRef.get();
-        let listingsData = listings.docs.map(listing => {
-            return {
-                _id: listing.id,
-                ...listing.data()
-            } as Listing
-        });
-        listingsData.sort((a, b) => a.pricePerFraction - b.pricePerFraction);
-
-        let remainingFractionsToBuy = quantity;
-        for (const source of listingsData) {
-            if (remainingFractionsToBuy <= 0) {
-                break
-            };
-
-            const canBuy = Math.min(remainingFractionsToBuy, source.quantity);
-            if (canBuy > 0) {
-                if (source.quantity - canBuy <= 0) {
-                    await listingsRef.doc(source._id).delete();
-                } else {
-                    await listingsRef.doc(source._id).update({ quantity: source.quantity - canBuy });
-                }
-
-                const holdingDocs = await getFirestore().collection('RetailUser').doc(source.listerId).collection('Holding').where('assetId', '==', parseInt(assetId)).get();
-                if (!holdingDocs.empty) {
-                    const holdingRef = holdingDocs.docs[0].ref;
-                    const holdingData = holdingDocs.docs[0].data() as Holding;
-                    await holdingRef.update({
-                        quantity: holdingData.quantity - canBuy,
-                        lockedQuantity: holdingData.lockedQuantity - canBuy,
-                    });
-                }
-                remainingFractionsToBuy -= canBuy;
-            }
-        }
-
-        const assetData = { _id: assetDoc.id, ...assetDoc.data() } as Asset;
-        listings = await listingsRef.get();
-        listingsData = listings.docs.map(listing => {
-            return {
-                _id: listing.id,
-                ...listing.data()
-            } as Listing
-        });
-        listingsData.sort((a, b) => a.pricePerFraction - b.pricePerFraction);
-        await assetRef.update({
-            availableSupply: assetData.availableSupply - quantity,
-            pricePerFraction: listingsData.length > 0 ? listingsData[0].pricePerFraction : 0
-        });
-    }
+/**
+ * REMOVED. The old purchaseSuccessOnBlockchain mutated listings, holdings and
+ * supply with admin rights, unauthenticated and without any on-chain
+ * verification (docs/audit/backend.md F-PUR-1). Settlement is now owned by
+ * the chain indexer (WS2): it observes FractionBought and the ERC20 Transfer
+ * logs, decrements listings, updates holdings and settles the order.
+ *
+ * This stub exists so stale imports fail loudly at review instead of
+ * silently writing nothing. Do not call it; delete the caller instead.
+ * Known caller to remove: src/utils/purchaseSuccess.ts (WS4 ownership).
+ */
+export async function purchaseSuccessOnBlockchain(
+  _assetId?: string,
+  _quantity?: number,
+): Promise<ActionResult<never>> {
+  return {
+    ok: false,
+    error: { code: 'gone', message: 'settlement is handled by the chain indexer' },
+  };
 }

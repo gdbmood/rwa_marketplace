@@ -1,243 +1,134 @@
 // src/store/__tests__/assetStore.test.ts
 import { act } from '@testing-library/react';
-import assetStore from '../assetStore';
-import { Asset } from '@/types/Asset';
-import { db } from '@/lib/firebaseClient';
-import nftStore from '../nftStore';
+import assetStore, { MarketplaceAsset } from '../assetStore';
+import { getPublicSupabase } from '@/hooks/useSupabaseBrowser';
 
-// Mock Firebase
-jest.mock('@/lib/firebaseClient', () => ({
-    db: {
-        collection: jest.fn(() => ({
-            get: jest.fn(),
-        })),
-    },
+// Mock the browser Supabase client
+jest.mock('@/hooks/useSupabaseBrowser', () => ({
+    getPublicSupabase: jest.fn(),
 }));
 
-// Mock nftStore
-jest.mock('../nftStore', () => ({
-    __esModule: true,
-    default: {
-        getState: jest.fn(() => ({
-            nfts: [],
-            setNfts: jest.fn(),
-            fetchNfts: jest.fn(),
-        })),
-    },
-}));
+const mockedGetPublicSupabase = getPublicSupabase as jest.Mock;
+
+function makeAsset(overrides: Partial<MarketplaceAsset> = {}): MarketplaceAsset {
+    return {
+        asset_id: 'asset-1',
+        available_supply: 800,
+        business_display_name: 'Acme Assets',
+        business_id: 'business-1',
+        business_logo_url: null,
+        category_id: 'category-1',
+        category_name: 'Watches',
+        category_slug: 'watches',
+        chain_id: 84532,
+        created_at: '2026-01-01T00:00:00Z',
+        description: null,
+        erc20_token_address: null,
+        floor_price_per_fraction: 10,
+        is_purchasable: true,
+        kyc_required: false,
+        listed_quantity: 100,
+        metadata: {},
+        mint_price_per_fraction: 10,
+        name: 'Test asset',
+        nft_id: 1,
+        status: 'active',
+        total_supply: 1000,
+        valuation: 10000,
+        ...overrides,
+    };
+}
+
+function mockSelect(result: { data: MarketplaceAsset[] | null; error: { message: string } | null }) {
+    const order = jest.fn().mockResolvedValue(result);
+    const select = jest.fn(() => ({ order }));
+    const from = jest.fn(() => ({ select }));
+    mockedGetPublicSupabase.mockReturnValue({ from });
+    return { from, select, order };
+}
 
 describe('assetStore', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        // Reset store state
-        assetStore.getState().setAssets([]);
+        act(() => {
+            assetStore.setState({ assets: [], loading: false, error: null });
+        });
     });
 
     describe('initial state', () => {
         it('should have empty assets array initially', () => {
-            const { assets } = assetStore.getState();
+            const { assets, loading, error } = assetStore.getState();
             expect(assets).toEqual([]);
+            expect(loading).toBe(false);
+            expect(error).toBeNull();
         });
     });
 
     describe('setAssets', () => {
         it('should update assets state', () => {
-            const mockAssets: Asset[] = [
-                {
-                    _id: 'asset1',
-                    createdAt: '2024-01-01',
-                    txHash: '0x123',
-                    initialSupply: 1000,
-                    availableSupply: 800,
-                    assetCategory: 'real-estate',
-                    minterId: 'minter1',
-                    pricePerFraction: 10,
-                },
-            ];
+            const mockAssets = [makeAsset()];
 
             act(() => {
                 assetStore.getState().setAssets(mockAssets);
             });
 
-            const { assets } = assetStore.getState();
-            expect(assets).toEqual(mockAssets);
+            expect(assetStore.getState().assets).toEqual(mockAssets);
         });
 
         it('should replace existing assets', () => {
-            const initialAssets: Asset[] = [
-                {
-                    _id: 'asset1',
-                    createdAt: '2024-01-01',
-                    txHash: '0x123',
-                    initialSupply: 1000,
-                    availableSupply: 800,
-                    assetCategory: 'real-estate',
-                    minterId: 'minter1',
-                    pricePerFraction: 10,
-                },
-            ];
-
-            const newAssets: Asset[] = [
-                {
-                    _id: 'asset2',
-                    createdAt: '2024-01-02',
-                    txHash: '0x456',
-                    initialSupply: 2000,
-                    availableSupply: 1500,
-                    assetCategory: 'stocks',
-                    minterId: 'minter2',
-                    pricePerFraction: 15,
-                },
-            ];
+            const initialAssets = [makeAsset({ asset_id: 'asset-1' })];
+            const newAssets = [makeAsset({ asset_id: 'asset-2', name: 'Other asset' })];
 
             act(() => {
                 assetStore.getState().setAssets(initialAssets);
             });
-
             act(() => {
                 assetStore.getState().setAssets(newAssets);
             });
 
-            const { assets } = assetStore.getState();
-            expect(assets).toEqual(newAssets);
-            expect(assets).not.toContain(initialAssets[0]);
+            expect(assetStore.getState().assets).toEqual(newAssets);
         });
     });
 
     describe('fetchAssets', () => {
-        it('should fetch and sort assets by creation date', async () => {
-            const mockAssetData = [
-                {
-                    id: 'asset1',
-                    data: () => ({
-                        createdAt: '2024-01-01',
-                        txHash: '0x123',
-                        initialSupply: 1000,
-                        availableSupply: 800,
-                        assetCategory: 'real-estate',
-                        minterId: 'minter1',
-                        pricePerFraction: 10,
-                    }),
-                },
-                {
-                    id: 'asset2',
-                    data: () => ({
-                        createdAt: '2024-01-02',
-                        txHash: '0x456',
-                        initialSupply: 2000,
-                        availableSupply: 1500,
-                        assetCategory: 'stocks',
-                        minterId: 'minter2',
-                        pricePerFraction: 15,
-                    }),
-                },
+        it('should hydrate assets from v_marketplace', async () => {
+            const rows = [
+                makeAsset({ asset_id: 'asset-2', created_at: '2026-02-01T00:00:00Z' }),
+                makeAsset({ asset_id: 'asset-1', created_at: '2026-01-01T00:00:00Z' }),
             ];
+            const { from, order } = mockSelect({ data: rows, error: null });
 
-            const mockQuerySnapshot = {
-                forEach: jest.fn((callback) => {
-                    mockAssetData.forEach(callback);
-                }),
-            };
-
-            jest.mocked(db).collection.mockReturnValue({
-                get: jest.fn().mockResolvedValue(mockQuerySnapshot),
-            } as any);
-
-            const result = await act(async () => {
-                return assetStore.getState().fetchAssets();
-            });
-
-            expect(jest.mocked(db).collection).toHaveBeenCalledWith('Asset');
-            expect(result).toHaveLength(2);
-
-            // Should be sorted by creation date (newest first)
-            expect(result[0]._id).toBe('asset2');
-            expect(result[1]._id).toBe('asset1');
-
-            const { assets } = assetStore.getState();
-            expect(assets).toEqual(result);
-        });
-
-        it('should handle empty firestore collection', async () => {
-            const mockQuerySnapshot = {
-                forEach: jest.fn(),
-            };
-
-            jest.mocked(db).collection.mockReturnValue({
-                get: jest.fn().mockResolvedValue(mockQuerySnapshot),
-            } as any);
-
-            const result = await act(async () => {
-                return assetStore.getState().fetchAssets();
-            });
-
-            expect(result).toEqual([]);
-
-            const { assets } = assetStore.getState();
-            expect(assets).toEqual([]);
-        });
-
-        it('should call nftStore.fetchNfts if nfts array is empty', async () => {
-            const mockFetchNfts = jest.fn();
-            jest.mocked(nftStore).getState.mockReturnValue({
-                nfts: [],
-                setNfts: jest.fn(),
-                fetchNfts: mockFetchNfts,
-            });
-
-            const mockQuerySnapshot = {
-                forEach: jest.fn(),
-            };
-
-            jest.mocked(db).collection.mockReturnValue({
-                get: jest.fn().mockResolvedValue(mockQuerySnapshot),
-            } as any);
-
+            let returned: MarketplaceAsset[] = [];
             await act(async () => {
-                await assetStore.getState().fetchAssets();
+                returned = await assetStore.getState().fetchAssets();
             });
 
-            expect(mockFetchNfts).toHaveBeenCalled();
+            expect(from).toHaveBeenCalledWith('v_marketplace');
+            expect(order).toHaveBeenCalledWith('created_at', { ascending: false });
+            expect(returned).toEqual(rows);
+            const { assets, loading, error } = assetStore.getState();
+            expect(assets).toEqual(rows);
+            expect(loading).toBe(false);
+            expect(error).toBeNull();
         });
 
-        it('should not call nftStore.fetchNfts if nfts array is not empty', async () => {
-            const mockFetchNfts = jest.fn();
-
-            jest.mocked(nftStore).getState.mockReturnValue({
-                nfts: ['mock-nft'] as any, // Non-empty array
-                setNfts: jest.fn(),
-                fetchNfts: mockFetchNfts,
+        it('should set the error flag and keep previous assets on failure', async () => {
+            const existing = [makeAsset()];
+            act(() => {
+                assetStore.getState().setAssets(existing);
             });
+            mockSelect({ data: null, error: { message: 'boom' } });
 
-            const mockQuerySnapshot = {
-                forEach: jest.fn(),
-            };
-
-            jest.mocked(db).collection.mockReturnValue({
-                get: jest.fn().mockResolvedValue(mockQuerySnapshot),
-            } as any);
-
+            let returned: MarketplaceAsset[] = [];
             await act(async () => {
-                await assetStore.getState().fetchAssets();
+                returned = await assetStore.getState().fetchAssets();
             });
 
-            expect(mockFetchNfts).not.toHaveBeenCalled();
-        });
-
-        it('should handle firestore errors gracefully', async () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-
-            jest.mocked(db).collection.mockReturnValue({
-                get: jest.fn().mockRejectedValue(new Error('Firestore error')),
-            } as any);
-
-            await expect(
-                act(async () => {
-                    await assetStore.getState().fetchAssets();
-                })
-            ).rejects.toThrow('Firestore error');
-
-            consoleErrorSpy.mockRestore();
+            expect(returned).toEqual(existing);
+            const { assets, loading, error } = assetStore.getState();
+            expect(assets).toEqual(existing);
+            expect(loading).toBe(false);
+            expect(error).toBe('Could not load marketplace assets');
         });
     });
 });

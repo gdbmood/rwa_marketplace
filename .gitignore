@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# local chain deployment output (contracts/scripts/deploy_local.ts)
+/e2e/.chain.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*
