@@ -20,3 +20,9 @@ Apply migrations either:
 
 - via the Supabase MCP (`apply_migration`), or
 - with the Supabase CLI: `supabase db push`
+
+Note on reading migrations in isolation: migration 20260903000003 creates
+v_marketplace as a definer view, and migration 20260903000006 rebuilds it as a
+security invoker view backed by the public business_profiles table. Applied in
+order the final state is the invoker view; the earlier file's header comment
+describes a superseded design.

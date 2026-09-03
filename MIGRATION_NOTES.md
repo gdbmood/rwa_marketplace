@@ -106,12 +106,15 @@ lint passing, jest 161+ tests passing, next build 15 of 15 pages):
   fetchAllListings), scripts/seed.ts (deterministic, idempotent),
   scripts/migrate-firestore-to-supabase.ts (dry run capable, delivered although
   the user chose recreate from zero).
-- On-ramp behind an OnrampProvider interface: thirdweb Bridge.Onramp primary,
-  mock provider for test mode, Transak stub. IMPORTANT research finding recorded
-  in docs/architecture/ONRAMP.md: thirdweb's payments FAQ lists the UAE as an
-  unsupported region, while Transak advertises UAE and AED support. Going live
-  for UAE users likely requires implementing the Transak provider (interface is
-  ready, stub in src/lib/onramp/transak.ts).
+- On-ramp behind an OnrampProvider interface. Research finding recorded in
+  docs/architecture/ONRAMP.md: thirdweb's payments FAQ lists the UAE as an
+  unsupported region, while Transak advertises UAE and AED support. The user
+  accepted Transak with EUR or USD, so Transak is now FULLY IMPLEMENTED
+  (src/lib/onramp/transak.ts, verified against live Transak docs, 31 unit
+  tests) and is the default provider via ONRAMP_PROVIDER. It activates once a
+  Transak partner account exists (checklist in ONRAMP.md). thirdweb
+  Bridge.Onramp remains available behind the same interface; the mock provider
+  serves test mode.
 - Frontend fully off Firebase (packages removed): drafts and Coming soon cards,
   buy flow with USDC and card tabs and full order state machine UI, business
   dashboard sales view, portfolio, transfer, KYC gating, loading, empty and
@@ -120,9 +123,11 @@ lint passing, jest 161+ tests passing, next build 15 of 15 pages):
   react-firebase-hooks all removed; eslint reinstated and passing.
 - Migration 8 (indexer_cursors) applied; generated types refreshed.
 
-Credentials still needed from the user (requested, not yet supplied):
-- SUPABASE_SERVICE_ROLE_KEY and SUPABASE_JWT_SECRET (dashboard, project settings).
-- NEXT_PUBLIC_THIRDWEB_CLIENT_ID and THIRDWEB_SECRET_KEY (thirdweb dashboard).
-- SUMSUB_TOKEN and SUMSUB_SECRET_KEY (Sumsub sandbox).
+Credentials: SUPABASE_SERVICE_ROLE_KEY and SUPABASE_JWT_SECRET were retrieved
+from the dashboard with the user's authorization on 2026-09-03 and live only in
+the gitignored .env.local. The complete production credential inventory (thirdweb,
+Sumsub production keys and webhook secret, Transak partner keys, exchange rate
+API key, indexer RPC, cron secret) is documented in .env.example and in the
+handover document section 6; Med obtains those, see docs/handover/HANDOVER.md.
 Test mode (local hardhat chain, test login, mock onramp) keeps the e2e suite
 independent of all of these; see docs/architecture/IMPLEMENTATION_PLAN.md.
