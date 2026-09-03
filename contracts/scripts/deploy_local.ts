@@ -32,7 +32,7 @@ const HARDHAT_PRIVATE_KEYS = [
   '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
   '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a',
   '0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6',
-  '0x47e179ec197488593b187f80a4cb0f14a26591f9c96b56b56cf6a0b7e13f9b46',
+  '0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a',
   '0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba',
   '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e',
   '0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356',
@@ -80,6 +80,18 @@ async function main() {
   const funded: Array<{ address: string; privateKey: string }> = [];
   for (let i = 0; i < fundCount; i += 1) {
     const account = signers[i];
+    // The pairing below is the whole point of this file's output, so verify it
+    // rather than trust it: a key that does not derive its paired address
+    // would make specs sign from an unfunded address, and the only symptom is
+    // an opaque "sender doesn't have enough funds, balance is 0" deep inside a
+    // test. Fail here instead, with the index named.
+    const derived = new ethers.Wallet(HARDHAT_PRIVATE_KEYS[i]).address;
+    if (derived.toLowerCase() !== account.address.toLowerCase()) {
+      throw new Error(
+        `HARDHAT_PRIVATE_KEYS[${i}] derives ${derived} but signer ${i} is ${account.address}. ` +
+          'Fix the key list in contracts/scripts/deploy_local.ts.',
+      );
+    }
     const tx = await usdc.mint(account.address, fundAmount);
     await tx.wait();
     funded.push({ address: account.address, privateKey: HARDHAT_PRIVATE_KEYS[i] });
