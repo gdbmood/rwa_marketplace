@@ -103,8 +103,8 @@ export default function BusinessProfileView(props: { profile: BusinessProfileDto
             <Box sx={{ border: { sm: 1 }, borderColor: "border", borderRadius: 2.5, px: { xs: 2.5, verticalTablet: 12 }, py: { xs: 2.5, verticalTablet: 7.5 }, display: "flex", gap: { xs: 5, horizontalTablet: 11 }, flexDirection: { xs: "column", verticalTablet: "row" } }}>
                 <Box sx={{ flexGrow: 1 }}>
                     <Typography style={{ fontWeight: 500 }} sx={{ typography: { xs: "h6", verticalTablet: "h5" }, color: "navbar.primary" }}>Account details</Typography>
-                    {error && <Typography variant="subtitle2" sx={{ color: "red" }}>{error}</Typography>}
-                    {notice && <Typography variant="subtitle2" sx={{ color: "#C6FF00" }}>{notice}</Typography>}
+                    {error && <Typography data-testid="business-profile-error" variant="subtitle2" sx={{ color: "red" }}>{error}</Typography>}
+                    {notice && <Typography data-testid="business-profile-notice" variant="subtitle2" sx={{ color: "#C6FF00" }}>{notice}</Typography>}
 
                     <Box sx={{ mt: 3, display: "flex", alignItems: "center", gap: 2 }}>
                         <Box sx={{ position: "relative", width: 72, height: 72, borderRadius: "50%", overflow: "hidden", backgroundColor: "#212121", flexShrink: 0 }}>
@@ -173,11 +173,11 @@ export default function BusinessProfileView(props: { profile: BusinessProfileDto
                                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: { sm: "center" }, gap: 1 }}>
                                     <Typography variant="subtitle1" style={{ fontWeight: 500 }} sx={{ color: "navbar.primary" }}>KYB Approved:</Typography>
                                     {props.profile.isVerified ? (
-                                        <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <svg data-testid="kyb-approved" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path fillRule="evenodd" clipRule="evenodd" d="M18 2.32129H6C3.79086 2.32129 2 4.11215 2 6.32129V18.3213C2 20.5304 3.79086 22.3213 6 22.3213H18C20.2091 22.3213 22 20.5304 22 18.3213V6.32129C22 4.11215 20.2091 2.32129 18 2.32129ZM16.592 9.78178C16.8463 9.45482 16.7874 8.98361 16.4605 8.72931C16.1335 8.47501 15.6623 8.53391 15.408 8.86087L11.401 14.0127C11.3119 14.1273 11.1443 14.1422 11.0364 14.0451L8.50173 11.7639C8.19385 11.4868 7.71963 11.5117 7.44254 11.8196C7.16544 12.1275 7.1904 12.6017 7.49828 12.8788L10.033 15.16C10.7881 15.8396 11.9613 15.7356 12.585 14.9336L16.592 9.78178Z" fill="#C6FF00" />
                                         </svg>
                                     ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" fill="currentColor" viewBox="0 0 16 16">
+                                        <svg data-testid="kyb-not-approved" xmlns="http://www.w3.org/2000/svg" width="24" height="25" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" style={{ color: "#FF0000" }} />
                                         </svg>
                                     )}

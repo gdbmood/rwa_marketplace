@@ -79,6 +79,21 @@ export async function recordTransaction(input: RecordTransactionInput): Promise<
   return unwrap(existing, 'transactions.recordTransaction');
 }
 
+/** The ledger row keyed on (tx_hash, log_index), or null when absent. */
+export async function getTransactionByTxLog(
+  txHash: string,
+  logIndex: number,
+): Promise<TransactionRow | null> {
+  const db = createServiceClient();
+  const result = await db
+    .from('transactions')
+    .select('*')
+    .eq('tx_hash', txHash)
+    .eq('log_index', logIndex)
+    .maybeSingle();
+  return unwrapMaybe(result, 'transactions.getTransactionByTxLog');
+}
+
 export async function listTransactionsForUser(userId: string): Promise<TransactionRow[]> {
   const db = createServiceClient();
   const result = await db

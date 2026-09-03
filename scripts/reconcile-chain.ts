@@ -15,13 +15,22 @@
  * unexplained diff exists. A diff is "explained" (pending) when unprocessed
  * chain_events rows still exist for the chain, because the indexer simply has
  * not caught up yet.
+ *
+ * Tokens with no code on the target chain are skipped (and counted) instead
+ * of failing the whole report: the seed writes fixture assets with fake token
+ * addresses on purpose (nft ids 9001/9002, so UI work needs no chain), and a
+ * fresh local hardhat node orphans tokens minted on a previous node. A
+ * balanceOf call on such an address can only throw; there is nothing on chain
+ * to reconcile those rows against.
  */
 
 import './lib/bootstrap';
+import { eth_getCode } from 'thirdweb/rpc';
 import { createServiceClient } from '../src/lib/supabase/server';
 import { unwrap } from '../src/lib/db/helpers';
 import { usdcToMicro, microToUsdc } from '../src/lib/indexer/core';
 import {
+  type IndexerChainContext,
   balanceOfOnChain,
   createIndexerChainContext,
   fetchAllListingsOnChain,
@@ -41,6 +50,26 @@ interface DiffRow {
   chain: string;
   status: 'DIFF' | 'PENDING';
   note: string;
+}
+
+const tokenCodeCache = new Map<string, boolean>();
+
+/** True when the address holds contract code on the target chain (cached). */
+async function tokenHasCode(ctx: IndexerChainContext, token: string): Promise<boolean> {
+  const key = token.toLowerCase();
+  const cached = tokenCodeCache.get(key);
+  if (cached !== undefined) {
+    return cached;
+  }
+  let hasCode = false;
+  try {
+    const code = await eth_getCode(ctx.rpc, { address: key as `0x${string}` });
+    hasCode = typeof code === 'string' && code !== '0x' && code !== '0x0';
+  } catch {
+    hasCode = false;
+  }
+  tokenCodeCache.set(key, hasCode);
+  return hasCode;
 }
 
 function parseArgs(argv: string[]): CliOptions {
@@ -138,6 +167,7 @@ async function main(): Promise<void> {
   const holdingsResult = await db.from('holdings').select('*');
   const holdings = unwrap(holdingsResult, 'reconcile.holdings');
   let checkedHoldings = 0;
+  const skippedTokensWithoutCode = new Set<string>();
 
   for (const holding of holdings) {
     const asset = assetById.get(holding.asset_id);
@@ -146,6 +176,12 @@ async function main(): Promise<void> {
     }
     const wallet = walletById.get(holding.user_id);
     if (!wallet) {
+      continue;
+    }
+    if (!(await tokenHasCode(ctx, asset.erc20_token_address))) {
+      // Seed fixture token or an orphan of a previous local node: nothing on
+      // this chain to reconcile against (see the header comment).
+      skippedTokensWithoutCode.add(asset.erc20_token_address.toLowerCase());
       continue;
     }
     checkedHoldings += 1;
@@ -199,8 +235,11 @@ async function main(): Promise<void> {
     }
     const primary = primaryByAssetId.get(asset.id);
     if (!primary) {
-      // No active primary listing: legitimate when fully sold out.
-      if (asset.status !== 'sold_out') {
+      // No active primary listing: legitimate when fully sold out, and when
+      // the issuer delisted (unlistFractions drains the resale book but the
+      // nfts[] entry stays isFractionalized forever; the contract has no
+      // on-chain delist state to compare against).
+      if (asset.status !== 'sold_out' && asset.status !== 'delisted') {
         diffs.push({
           kind: 'primary_listing_missing',
           asset: asset.name,
@@ -255,6 +294,7 @@ async function main(): Promise<void> {
           checkedHoldings,
           checkedListings,
           hasPendingEvents,
+          skippedTokensWithoutCode: [...skippedTokensWithoutCode],
           diffs,
           unexplained: unexplained.length,
         },
@@ -266,6 +306,11 @@ async function main(): Promise<void> {
     console.log(
       `Reconcile chain ${ctx.chainId}: ${checkedHoldings} holdings, ${checkedListings} primary listings checked.`,
     );
+    if (skippedTokensWithoutCode.size > 0) {
+      console.log(
+        `Note: ${skippedTokensWithoutCode.size} token(s) without code on this chain were skipped (seed fixtures or orphans of a previous local node).`,
+      );
+    }
     if (hasPendingEvents) {
       console.log('Note: unprocessed chain_events exist; diffs are marked PENDING.');
     }

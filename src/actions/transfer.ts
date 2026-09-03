@@ -3,10 +3,31 @@
 import { requireUser } from '@/lib/auth/session';
 import { getAssetById } from '@/lib/db/assets';
 import { getUserByWallet } from '@/lib/db/users';
-import { type TransactionRow, recordTransaction } from '@/lib/db/transactions';
+import {
+  type TransactionRow,
+  getTransactionByTxLog,
+  recordTransaction,
+} from '@/lib/db/transactions';
 import { findErc20TransferLog, verifyTxReceipt } from '@/actions/chain';
 import { type ActionResult, err, ok, toActionError } from '@/actions/result';
 import { isPositiveInteger, isTxHash, isUuid, isWalletAddress } from '@/actions/validate';
+
+/**
+ * How long to wait for the indexer to record the transfer itself before
+ * falling back to a direct ledger write. The indexer skips holdings work for
+ * a Transfer event whose (tx_hash, log_index) ledger row already exists, so
+ * writing the row here first would leave both parties' balances stale until
+ * a manual reconcile. Overridable for environments with a slower indexer.
+ */
+const INDEXER_RECORD_WAIT_MS = (() => {
+  const parsed = Number.parseInt(process.env.TRANSFER_RECORD_WAIT_MS ?? '', 10);
+  return Number.isNaN(parsed) || parsed < 0 ? 15_000 : parsed;
+})();
+const INDEXER_RECORD_POLL_MS = 500;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export interface RecordTransferInput {
   assetId: string;
@@ -67,6 +88,28 @@ export async function recordTransfer(
       return err('chain_error', 'Transfer parties do not match the transaction');
     }
 
+    // Prefer the indexer's own ledger row: the indexer observes the same
+    // Transfer log, moves BOTH parties' holdings and writes the transactions
+    // row keyed on (tx_hash, log_index). If this action wrote that row first,
+    // the indexer would treat the event as already recorded and skip the
+    // holdings update entirely, so give it a bounded window to land first.
+    if (transferLog.logIndex !== null) {
+      const deadline = Date.now() + INDEXER_RECORD_WAIT_MS;
+      for (;;) {
+        const indexed = await getTransactionByTxLog(input.txHash, transferLog.logIndex);
+        if (indexed) {
+          return ok(indexed);
+        }
+        if (Date.now() >= deadline) {
+          break;
+        }
+        await sleep(INDEXER_RECORD_POLL_MS);
+      }
+    }
+
+    // Fallback (indexer down or badly behind): record the ledger row directly
+    // so the user's history is not lost. Holdings then wait on the reconcile
+    // pass, which matches the pre-existing behavior of this path.
     const recipient = await getUserByWallet(toWallet);
 
     const transaction = await recordTransaction({

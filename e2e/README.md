@@ -109,6 +109,66 @@ test('example', async ({ page, request, walletFor, loginAs, sumsubApprove, chain
 - `db()` throws a clear SKIP message while `SUPABASE_SERVICE_ROLE_KEY` is a
   placeholder (global setup fails fast on that anyway).
 
+## Business journey spec (e2e/specs/business.spec.ts)
+
+One serial chain covering the full BUSINESS journey: register (first
+test-auth login creates the users row), complete profile, KYB via the signed
+Sumsub webhook, draft listing (Watches category with string / number /
+dropdown / document fields, image + document uploads from
+`e2e/fixtures-data/`), draft edit, Coming soon card in the marketplace, mint
+and list with a real on-chain transaction, dashboard sales view, listing
+metadata + primary price update, delist, transaction history, settings
+persistence.
+
+Details worth knowing:
+
+- The journey actor is hardhat account 6 (`e2e/specs/helpers/business.ts`):
+  funded by the deploy (FUND_ACCOUNTS=10) but outside the seed roster, so
+  registration is real and seeded users are never mutated.
+- Business pages are served behind the business subdomain
+  (`src/middleware.ts`), so the spec drives them on
+  `http://business.localhost:3100`. The session cookie from
+  `POST /api/test-auth` (main origin) is cloned onto that origin, because
+  cookies are host-scoped. `*.localhost` resolves to loopback on modern
+  macOS / Chromium; if `business.localhost` does not resolve on your machine,
+  add it to /etc/hosts.
+- Re-entrancy against the shared remote database: asset names are unique per
+  worker run, the journey user is normalized at spec start (type business,
+  RED webhook resets is_verified), and stale `minting` assets from crashed
+  runs are parked as delisted before publishing so the indexer's
+  oldest-minting-asset fallback cannot promote the wrong row.
+- `e2e/fixtures-data/` holds the tiny upload fixtures (valid 8x8 PNGs and a
+  one-page PDF). Uploads land in the remote Supabase storage buckets.
+
+## Spec inventory and ordering
+
+- `specs/00-harness.smoke.spec.ts` - stack self-checks (chain, app, webhook).
+- `specs/system.spec.ts` - the SYSTEM guarantees, serial: (1) the indexer
+  reconciles a purchase completed while the browser was closed (buy driven
+  from node with viem, no orders row; the indexer must synthesize the settled
+  `chain_direct` order, move holdings, decrement the listing, write the
+  transactions rows), (2) two pre-signed concurrent buys for the last
+  fractions where the chain reverts exactly one, plus a UI variant that parks
+  the losing browser's buyFractions RPC until a rival lands the purchase and
+  then asserts the buy flow renders the failure, (3) RLS: an
+  `/api/rls-token` JWT for investor1 reads own holdings but zero rows for
+  investor2, anon reads active listings and zero holdings. Each chain-heavy
+  test mints its own fresh asset through the real contract; a cross-run
+  hygiene pass neutralizes rows orphaned by a hardhat node reset
+  (deterministic deploys reuse nft ids and token addresses across fresh
+  nodes) and rewinds a stale indexer cursor.
+- `specs/reconcile.spec.ts` - runs `scripts/reconcile-chain.ts` as a child
+  process and requires exit 0 with zero unexplained diffs. It must run LAST:
+  the config defines a `reconcile` project that matches only this file and
+  depends on the `suites` project (everything else). Dependencies always run
+  in full, so filtering a run to `reconcile.spec.ts` still executes the
+  suites first, and a suites failure skips the reconcile gate.
+
+The system specs sign transactions with viem (resolved from the root
+node_modules, where it ships as a dependency of thirdweb v5) so tx hashes are
+known before broadcast; order rows can then carry `tx_hash` in `submitted`
+before the indexer can possibly observe the transaction.
+
 ## Required env (.env.local)
 
 - `SUPABASE_SERVICE_ROLE_KEY` - REAL key for the remote Supabase project.

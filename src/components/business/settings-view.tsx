@@ -75,9 +75,9 @@ export default function BusinessSettingsView(props: { settings: BusinessSettings
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                         <Typography style={{ fontWeight: 500 }} sx={{ typography: { xs: "h6", verticalTablet: "h5" }, color: "navbar.primary" }}>Settings</Typography>
                         {saving && <CircularProgress size={16} sx={{ color: "#C6FF00" }} />}
-                        {!saving && saved && <Typography variant="caption" sx={{ color: "#C6FF00" }}>Saved</Typography>}
+                        {!saving && saved && <Typography data-testid="business-settings-saved" variant="caption" sx={{ color: "#C6FF00" }}>Saved</Typography>}
                     </Box>
-                    {error && <Typography variant="subtitle2" sx={{ color: "red", mt: 1 }}>{error}</Typography>}
+                    {error && <Typography data-testid="business-settings-error" variant="subtitle2" sx={{ color: "red", mt: 1 }}>{error}</Typography>}
 
                     <Box sx={{ mt: 4, display: "flex", alignItems: "center", gap: 4 }}>
                         <Autocomplete
@@ -121,6 +121,7 @@ export default function BusinessSettingsView(props: { settings: BusinessSettings
                                     </Typography>
                                 </Box>
                                 <Checkbox
+                                    data-testid={`business-pref-${item.id}`}
                                     checked={preferences[item.id] ?? false}
                                     onChange={(e) => {
                                         const next = { ...preferences, [item.id]: e.target.checked };

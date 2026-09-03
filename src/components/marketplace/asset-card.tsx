@@ -26,6 +26,7 @@ export default function AssetCard({ asset }: AssetCardProps) {
 
   return (
     <Box
+      data-testid="marketplace-asset-card"
       onClick={() => router.push(`/asset/${asset.asset_id}`)}
       sx={{
         backgroundColor: 'listingCard.background',

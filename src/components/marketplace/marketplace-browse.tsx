@@ -276,6 +276,7 @@ export default function MarketplaceBrowse({
                 field.filterOptions.map((option) => (
                   <Box key={option} sx={{ display: 'flex', alignItems: 'center' }}>
                     <Checkbox
+                      data-testid={`filter-option-${option}`}
                       checked={fieldFilters[field.name] === option}
                       onChange={() => toggleFieldFilter(field.name, option)}
                       sx={{

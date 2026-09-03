@@ -95,7 +95,7 @@ function AssetCard(props: { asset: BusinessAssetDto }) {
     const manageHref = `/asset/${asset.nftId ?? asset.id}/update`;
 
     return (
-        <Box sx={{ width: { xs: "100%", sm: "300px" }, backgroundColor: "navbar.background", border: 1, borderColor: "border", borderRadius: "10px", overflow: "hidden" }}>
+        <Box data-testid="business-asset-card" sx={{ width: { xs: "100%", sm: "300px" }, backgroundColor: "navbar.background", border: 1, borderColor: "border", borderRadius: "10px", overflow: "hidden" }}>
             <Box sx={{ position: "relative", height: "170px", backgroundColor: "#212121" }}>
                 {asset.imageUrl ? (
                     <Image src={asset.imageUrl} alt={asset.name} fill sizes="300px" style={{ objectFit: "cover" }} />

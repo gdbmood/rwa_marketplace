@@ -42,10 +42,23 @@ export default defineConfig({
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
+  // Two projects purely for ordering: "reconcile" holds only the final
+  // chain-vs-database reconciliation gate (e2e/specs/reconcile.spec.ts) and
+  // depends on "suites" (every other spec), so it always runs last and is
+  // skipped when the suites failed. Note that project dependencies always run
+  // in full: filtering a run down to reconcile.spec.ts still executes the
+  // whole suites project first.
   projects: [
     {
-      name: 'chromium',
+      name: 'suites',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: /reconcile\.spec\.ts/,
+    },
+    {
+      name: 'reconcile',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /reconcile\.spec\.ts/,
+      dependencies: ['suites'],
     },
   ],
   webServer: {

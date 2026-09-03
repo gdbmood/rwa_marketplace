@@ -170,8 +170,8 @@ export default function ListNewAssetView(props: {
                     <Typography style={{ fontWeight: 500 }} sx={{ typography: { xs: "h5", sm: "h3" }, color: "marketplace.categoryFilter.background", mb: 4, width: "100%", textAlign: "center" }}>
                         {draftId ? "Edit Draft Asset" : "List New Asset"}
                     </Typography>
-                    {error && <Typography variant="body1" sx={{ color: "#FF0000", fontWeight: 500, mb: 2 }}>{error}</Typography>}
-                    {notice && <Typography variant="body1" sx={{ color: "#C6FF00", fontWeight: 500, mb: 2 }}>{notice}</Typography>}
+                    {error && <Typography data-testid="listing-form-error" variant="body1" sx={{ color: "#FF0000", fontWeight: 500, mb: 2 }}>{error}</Typography>}
+                    {notice && <Typography data-testid="listing-form-notice" variant="body1" sx={{ color: "#C6FF00", fontWeight: 500, mb: 2 }}>{notice}</Typography>}
 
                     <AssetForm
                         categories={categories}

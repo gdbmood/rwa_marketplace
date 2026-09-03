@@ -444,6 +444,7 @@ function HoldingCard({
 
   return (
     <Box
+      data-testid="portfolio-holding"
       sx={{
         mt: 3,
         display: 'flex',

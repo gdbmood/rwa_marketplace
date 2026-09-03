@@ -183,6 +183,7 @@ function SettingsForm({ user }: { user: SessionUser }) {
                                 </Typography>
                             </Box>
                             <Checkbox
+                                data-testid={`pref-${item.id}`}
                                 checked={preferences[item.id] ?? true}
                                 onChange={(e) => {
                                     const next = { ...preferences, [item.id]: e.target.checked };

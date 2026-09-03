@@ -182,7 +182,7 @@ export default function UpdateAssetView(props: {
                             <Typography variant="subtitle1" sx={{ color: "assetPurchase.documentRedirectSecondaryText", mt: 2, textAlign: "center" }}>
                                 {props.primaryListing?.quantity ?? 0} unsold fraction(s) of {props.asset.name} will be removed from the marketplace. Buyers who already own fractions keep them.
                             </Typography>
-                            {delistError && <Typography variant="subtitle2" sx={{ color: "red", mt: 2, textAlign: "center" }}>{delistError}</Typography>}
+                            {delistError && <Typography data-testid="delist-error" variant="subtitle2" sx={{ color: "red", mt: 2, textAlign: "center" }}>{delistError}</Typography>}
                             <Box sx={{ display: "flex", gap: 2, mt: 5, flexWrap: "wrap", justifyContent: "center" }}>
                                 <Button disabled={delisting} onClick={() => setDelistOpen(false)} variant="contained" sx={{ backgroundColor: "marketplace.viewMoreButtonBackground", borderRadius: 5, border: 1, borderColor: "marketplace.searchButtonBorder", py: 1, px: 4, color: "navbar.primary" }}>
                                     Keep it listed
@@ -216,7 +216,7 @@ export default function UpdateAssetView(props: {
                     <Typography style={{ fontWeight: 500 }} sx={{ typography: { xs: "h5", sm: "h3" }, color: "marketplace.categoryFilter.background", mb: 4, width: "100%", textAlign: "center" }}>
                         Update the asset
                     </Typography>
-                    {error && <Typography variant="body1" sx={{ color: "#FF0000", fontWeight: 500, mb: 2 }}>{error}</Typography>}
+                    {error && <Typography data-testid="update-asset-error" variant="body1" sx={{ color: "#FF0000", fontWeight: 500, mb: 2 }}>{error}</Typography>}
 
                     <AssetForm
                         categories={props.categories}

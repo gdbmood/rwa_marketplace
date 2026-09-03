@@ -282,7 +282,7 @@ export default function AssetForm(props: {
                 >
                     {({ getRootProps, getInputProps, open }) => (
                         <Box {...getRootProps()} onClick={open} sx={{ border: values.images.length === 0 ? "1px dashed #424242" : "", borderRadius: "10px", p: values.images.length === 0 ? 2 : 0, display: "flex", flexDirection: "column", alignItems: "center", cursor: "pointer" }}>
-                            <input {...getInputProps()} />
+                            <input {...getInputProps()} data-testid="asset-image-input" />
                             {values.images.length > 0 ? (
                                 <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <rect width="60" height="60" rx="8" fill="#212121" />
@@ -352,7 +352,7 @@ export default function AssetForm(props: {
                             >
                                 {({ getRootProps, getInputProps, open }) => (
                                     <Box {...getRootProps()} onClick={open} sx={{ border: files.length === 0 ? "1px dashed #424242" : "", borderRadius: "10px", p: files.length ? 0 : 2, display: "flex", flexDirection: "column", alignItems: files.length ? "flex-start" : "center", cursor: "pointer" }}>
-                                        <input {...getInputProps()} />
+                                        <input {...getInputProps()} data-testid={`asset-document-input-${field.key}`} />
                                         {files.length > 0 ? (
                                             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <rect width="60" height="60" rx="8" fill="#212121" />
