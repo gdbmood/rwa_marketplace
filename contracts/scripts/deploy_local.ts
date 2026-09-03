@@ -11,7 +11,10 @@
  *     USDC, matching production semantics),
  *   - the Marketplace behind a transparent proxy, initialized with the mock
  *     USDC address and the deployer as fee recipient,
- *   - funds the first FUND_ACCOUNTS (default 5) test accounts with mock USDC.
+ *   - funds the first FUND_ACCOUNTS (default 10, i.e. every standard hardhat
+ *     account) test accounts with mock USDC. The e2e wallet roster
+ *     (e2e/wallets.ts, shared with scripts/seed.ts) maps roles onto accounts
+ *     0..5 in this exact order, so keep the key list below unchanged.
  *
  * Writes addresses plus the well-known hardhat test private keys to
  * e2e/.chain.json at the repo root (gitignored) for Playwright and the
@@ -68,7 +71,7 @@ async function main() {
   console.log('Marketplace proxy deployed to:', marketplaceAddress);
 
   const fundCount = Math.min(
-    Number.parseInt(process.env.FUND_ACCOUNTS || '5', 10) || 5,
+    Number.parseInt(process.env.FUND_ACCOUNTS || '10', 10) || 10,
     signers.length,
     HARDHAT_PRIVATE_KEYS.length,
   );

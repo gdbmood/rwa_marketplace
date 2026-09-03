@@ -4,7 +4,9 @@
  * Usage:
  *   npx tsx scripts/seed.ts
  *
- * Creates (idempotently, keyed by fixed wallet addresses and internal ids):
+ * Creates (idempotently, keyed by fixed wallet addresses and internal ids;
+ * the wallets are the funded hardhat accounts from e2e/wallets.ts so chain
+ * actors and database users line up in the e2e suite):
  *   - 1 admin user (retail type, settings.role = 'admin'; the schema has no
  *     admin user_type, the flag lives in settings until an admin surface
  *     lands),
@@ -20,6 +22,7 @@
  */
 
 import './lib/bootstrap';
+import { WALLETS } from '../e2e/wallets';
 import type { Json } from '../src/types/database';
 import { createServiceClient } from '../src/lib/supabase/server';
 import { unwrapMaybe } from '../src/lib/db/helpers';
@@ -45,14 +48,9 @@ const CHAIN_ID = (() => {
   return Number.isNaN(parsed) ? 31337 : parsed;
 })();
 
-const WALLETS = {
-  admin: '0x1000000000000000000000000000000000000001',
-  business1: '0x2000000000000000000000000000000000000001',
-  business2: '0x2000000000000000000000000000000000000002',
-  investor1: '0x3000000000000000000000000000000000000001',
-  investor2: '0x3000000000000000000000000000000000000002',
-  investor3: '0x3000000000000000000000000000000000000003',
-} as const;
+// Wallet roster comes from e2e/wallets.ts: the standard hardhat development
+// accounts, in the order contracts/scripts/deploy_local.ts funds them, so the
+// database users seeded here ARE the on-chain actors of the e2e suite.
 
 // Fake mint data for the two active assets (chain-shaped but not on chain).
 const SEED_ASSETS = {
