@@ -342,7 +342,12 @@ Run with a real wallet and a small amount of real USDC:
 
 ## 9. Known gaps and recommended next steps
 
-KNOWN_GAPS_PENDING: this section is completed after the end to end verification run finishes. The items below are stable and already known.
+Verification status at the time of writing: the full end to end suite passes,
+37 of 37 tests in one run against a local Base-compatible chain with the
+indexer live, and the chain reconciliation gate (`scripts/reconcile-chain.ts`)
+exits zero with no unexplained differences between the database and the chain.
+Unit tests are 167 of 167, typecheck and lint are clean, and the production
+build succeeds. The gaps below are the work that remains.
 
 1. Vercel deployment untested, by decision. The user chose to skip the Vercel preview; all verification ran locally (build, unit tests, e2e stack with local chain and indexer). The first production deploy must follow section 8d and watch the listed points.
 2. thirdweb Pay unsupported for UAE, Transak is the default. thirdweb's own FAQ lists the UAE as an unsupported region, so the card on-ramp defaults to Transak. Transak is fully implemented but requires a KYB-approved partner account before it can serve real payments; the activation checklist for Med is in `docs/architecture/ONRAMP.md` section 5.4, including four provider behaviours to verify against staging.
@@ -350,6 +355,22 @@ KNOWN_GAPS_PENDING: this section is completed after the end to end verification 
 4. Royalty distribution not surfaced. `depositRevenue` exists on the contract but has no UI in the app; the audit also found the creator is excluded from the holder list so their share leaks to the platform owner. Recommend surfacing revenue distribution together with the contract fix in the same upgrade.
 5. No admin surface. There is no admin UI for category management, KYC overrides, fee configuration or listing moderation. The `audit_log` table exists and privileged actions are recorded, so an admin panel can be added without schema changes.
 6. Production credentials to be wired by Med. See section 6: Supabase production project keys, thirdweb, Sumsub production keys and webhook secret, Transak partner keys, exchange rate API key (rotate the compromised legacy key), and a fresh AUTH_PRIVATE_KEY.
+7. The e2e suite runs against a production build, not `next dev`. On-demand
+   compilation in dev put 13 to 41 second delays inside test timeouts (measured
+   on the on-ramp webhook and status routes), which made the suite flaky and,
+   because the specs are serial, aborted later tests. The harness now builds
+   once into `.next-e2e` and serves it, which also cut the run from about 17
+   minutes to under 4. `E2E_DEV=1` restores the dev server when iterating on UI.
+8. Nothing has been exercised against a public testnet or mainnet. All chain
+   verification used a local node with the contracts deployed fresh. Before
+   production, run the same journeys against Base Sepolia with a funded key,
+   then repeat the smoke test in section 8f on mainnet with a small purchase.
+9. Test-only surfaces exist behind flags and must stay disabled in production.
+   `/api/test-auth` returns 404 unless `TEST_MODE=1` and it refuses to run on
+   Vercel, and the local signer plus the mock on-ramp are gated on
+   `NEXT_PUBLIC_TEST_MODE`. Confirm neither flag is set in the production
+   environment; the build that serves the suite must never be shipped.
+ See section 6: Supabase production project keys, thirdweb, Sumsub production keys and webhook secret, Transak partner keys, exchange rate API key (rotate the compromised legacy key), and a fresh AUTH_PRIVATE_KEY.
 
 ---
 
