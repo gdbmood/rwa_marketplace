@@ -9,14 +9,18 @@ fallback).
 
 ## 1. Decision
 
-thirdweb Bridge.Onramp is the primary fiat on-ramp provider, behind a
-provider-agnostic `OnrampProvider` interface (`src/lib/onramp/types.ts`).
-Transak is the recorded fallback, stubbed behind the same interface
-(`src/lib/onramp/transak.ts`) so a swap changes zero route, repository or UI
-code. A deterministic mock provider (`src/lib/onramp/mock.ts`) is wired when
+Updated 2026-09-03 (user decision): **Transak is the accepted on-ramp path
+for production**, because thirdweb Pay does not support UAE users (the launch
+market). **EUR or USD are acceptable fiat currencies; AED is not required.**
+Transak is now fully implemented behind the provider-agnostic
+`OnrampProvider` interface (`src/lib/onramp/transak.ts`, no longer a stub)
+and is the default provider; see section 5 for implementation status and the
+activation checklist. thirdweb Bridge.Onramp remains implemented
+(`src/lib/onramp/thirdweb.ts`) and selectable via `ONRAMP_PROVIDER=thirdweb`.
+A deterministic mock provider (`src/lib/onramp/mock.ts`) is wired when
 `TEST_MODE=1`.
 
-Reasons for thirdweb primary:
+Historical context, reasons thirdweb was originally primary:
 
 - It is the operative choice recorded in docs/PRODUCT_KNOWLEDGE.md (fork
   spec: "use thirdweb Checkout/Pay for embedded card -> auto onramp to USDC",
@@ -118,7 +122,8 @@ USDC units; conversion to on-chain bigint micro USDC happens only in
 `src/lib/onramp/usdc.ts`.
 
 Provider selection (`src/lib/onramp/index.ts`): `TEST_MODE=1` selects the
-mock, otherwise thirdweb.
+mock, otherwise `ONRAMP_PROVIDER` picks `thirdweb` or `transak`. The default
+is `transak` (UAE decision, section 1).
 
 ### 3.2 thirdweb implementation (src/lib/onramp/thirdweb.ts)
 
@@ -188,35 +193,163 @@ tests can force transitions.
 | `THIRDWEB_WEBHOOK_SECRET` | NEW, read via process.env in src/lib/onramp/thirdweb.ts | verifies webhook signatures; set when creating the webhook in the thirdweb dashboard pointing at /api/onramp/webhook |
 | `THIRDWEB_ONRAMP_PROVIDER` | NEW, optional | fiat sub-provider: coinbase (default), stripe, transak |
 | `TEST_MODE` | plan-defined | 1 selects the mock provider |
+| `ONRAMP_PROVIDER` | exists in src/lib/env.ts, optional | active provider: transak (default) or thirdweb |
+| `TRANSAK_API_KEY` | exists in src/lib/env.ts | Transak partner API key (widget URL, order polling); from the Transak partner dashboard |
+| `TRANSAK_API_SECRET` | exists in src/lib/env.ts | Transak partner API secret; mints 7-day partner access tokens used for order polling and webhook verification |
+| `TRANSAK_ENVIRONMENT` | exists in src/lib/env.ts, optional | STAGING (default) or PRODUCTION; switches widget and API hosts |
 
-Handoff: `THIRDWEB_WEBHOOK_SECRET` and `THIRDWEB_ONRAMP_PROVIDER` should be
-added to `src/lib/env.ts` (`ServerEnvName`) and `.env.example` by the
-workstream that owns those files.
+Note: the previously planned `TRANSAK_WEBHOOK_SECRET` variable was dropped.
+Transak signs webhook payloads with the partner access token (minted from
+`TRANSAK_API_SECRET`), not with a separate webhook secret; verified against
+live docs, section 5.2.
 
-## 5. Transak fallback plan
+## 5. Transak implementation (default provider)
 
-Behind the same `OnrampProvider` interface; activating it means implementing
-`src/lib/onramp/transak.ts` (currently a clearly marked not-implemented stub
-whose `createSession` throws `provider_error`) and switching the provider
-returned by `getOnrampProvider()` (an `ONRAMP_PROVIDER` env switch is the
-natural extension). No route, repository, schema or UI changes.
+Status: **implemented** in `src/lib/onramp/transak.ts` (2026-09-03), unit
+tested in `src/lib/onramp/__tests__/transak.test.ts`. It needs Transak
+partner credentials (`TRANSAK_API_KEY`, `TRANSAK_API_SECRET`) to activate;
+until Med's partner account exists, every call fails fast with a clear
+`MissingEnvError`. `TRANSAK_ENVIRONMENT` defaults to STAGING so the first
+credentials can be exercised safely against Transak's staging stack before
+`PRODUCTION` is set.
 
-Planned mapping (detailed in the stub's header comment):
+### 5.1 How it maps onto the interface
 
-- `createSession`: hosted widget URL with `apiKey`, `walletAddress`,
-  `cryptoCurrencyCode=USDC`, `network`, `fiatCurrency` (AED),
-  `partnerOrderId=orders.id`.
-- `getSessionStatus`: partner orders API.
-- `parseWebhook`: verified ORDER_* events; ORDER_PAYMENT_VERIFYING ->
-  pending, ORDER_COMPLETED -> completed, ORDER_FAILED -> failed,
-  ORDER_CANCELLED -> canceled.
-- Env vars needed: `TRANSAK_API_KEY`, `TRANSAK_API_SECRET`,
-  `TRANSAK_ENVIRONMENT`, `TRANSAK_WEBHOOK_SECRET`.
+- `createSession` builds the hosted widget URL locally (no network call):
+  `https://global-stg.transak.com` (STAGING) or `https://global.transak.com`
+  (PRODUCTION) with `apiKey`, `environment`, `fiatCurrency` (USD default,
+  EUR supported; anything else falls back to USD and the returned quote says
+  so), `cryptoCurrencyCode=USDC`, `network=base` (chain ids 8453 and 84532),
+  `walletAddress` plus `disableWalletAddressForm=true` (delivery locked to
+  the buyer's marketplace wallet), `partnerCustomerId=users.id` and
+  `partnerOrderId=transak_<uuid>`. That generated partnerOrderId is our
+  provider session id: Transak echoes it in every webhook and accepts it as
+  an order filter, so correlation works before Transak assigns its own order
+  id. `defaultCryptoAmount` (or `defaultFiatAmount` when the caller pinned a
+  fiat hint) pre-fills the amount; the quote's fiat amount stays null unless
+  pinned because Transak quotes fees inside the widget.
+- `getSessionStatus` polls `GET /partners/api/v2/orders` with
+  `filter[partnerOrderId]`, authenticated by `x-api-key` plus a partner
+  access token (`POST /partners/api/v2/refresh-token` with the API secret;
+  cached until shortly before its 7-day expiry, refreshed once on a 401). No
+  order yet maps to `created`; any COMPLETED order among widget retries wins;
+  otherwise the newest order's status is mapped.
+- `parseWebhook` expects Transak's `{ "data": "<JWT>" }` body, verifies the
+  JWT with the current partner access token (HS256 pinned, constant-time
+  compare, one forced token refresh before rejecting in case Transak rotated
+  it), handles only `ORDER_*` events (KYC events return null), correlates by
+  `webhookData.partnerOrderId` and persists the decoded payload as
+  `raw_payload`.
 
-Prerequisites before activation: a Transak partner account (KYB), browser
-verification of current UAE/AED terms (their site blocks automated fetches,
-section 2.2), and a decision on whether Transak runs alongside thirdweb
-(per-user geo routing) or replaces it.
+### 5.2 Status mapping (conservative)
+
+Only COMPLETED, FAILED and CANCELLED are terminal. Everything else maps to
+`pending` so a provider status can never falsely terminalize a session; the
+raw payload keeps Transak's exact status for ops review.
+
+| Transak order status | onramp_status |
+| --- | --- |
+| AWAITING_PAYMENT_FROM_USER | pending |
+| PAYMENT_DONE_MARKED_BY_USER | pending |
+| PROCESSING | pending |
+| PENDING_DELIVERY_FROM_TRANSAK | pending |
+| ON_HOLD_PENDING_DELIVERY_FROM_TRANSAK | pending |
+| COMPLETED | completed |
+| FAILED | failed |
+| CANCELLED | canceled |
+| EXPIRED | pending (deliberate: not on the agreed terminal list; ops resolves via raw_payload) |
+| REFUNDED | pending (same reasoning; a refund after completion never regresses the session anyway) |
+| anything unknown | pending |
+
+### 5.3 Verified against live docs vs modeled
+
+Verified by fetching docs.transak.com on 2026-09-03:
+
+- Widget query parameters and semantics: `apiKey`, `environment`
+  (STAGING | PRODUCTION), `fiatCurrency` (locks the currency),
+  `fiatAmount` (locks) and `defaultFiatAmount` (pre-fills),
+  `cryptoCurrencyCode`, `network`, `walletAddress`,
+  `disableWalletAddressForm`, `partnerOrderId` (echoed in webhooks),
+  `partnerCustomerId`, `redirectURL` (docs/query-parameters).
+- Staging widget host `https://global-stg.transak.com`
+  (docs/integration-options).
+- Access token API: `POST https://api-stg.transak.com/partners/api/v2/refresh-token`,
+  headers `x-api-key` and `api-secret`, body `{ apiKey }`, response
+  `{ data: { accessToken, expiresAt } }`, 7-day validity
+  (reference/refresh-access-token).
+- Orders API: `GET .../partners/api/v2/orders` with headers `x-api-key` and
+  `access-token`, `filter[partnerOrderId]` exact match, `limit`, `skip`,
+  `filter[sortOrder]` (reference/get-orders); single order by Transak id at
+  `GET .../partners/api/v2/order/{orderId}` (reference/get-order-by-order-id).
+- Webhook model: POST body `{ "data": "<JWT>" }`, JWT signed HS256 and
+  verified with the partner access token (their example uses
+  `jsonwebtoken.verify(data, accessToken)`); decoded shape
+  `{ eventID, createdAt, webhookData: { id, status, walletAddress,
+  transactionHash, ... } }`; order event ids ORDER_CREATED,
+  ORDER_PAYMENT_VERIFYING, ORDER_PROCESSING, ORDER_COMPLETED, ORDER_FAILED,
+  ORDER_REFUNDED (docs/webhooks, guides/how-to-decrypt-webhook-payload).
+- Order status list as in the table above (guides/track-order-status).
+- Network code `base` exists and USDC on Base is listed (uniqueId
+  `USDCbase`); on staging, network `base` reports chainId 84532 (Base
+  Sepolia), so staging and production share the code and the implementation
+  maps 8453 and 84532 to `base` (reference/get-crypto-currencies).
+
+Modeled from the documented model, NEEDS VERIFICATION with a real partner
+account:
+
+- Production hosts `https://global.transak.com` and
+  `https://api.transak.com`: the fetched pages only show the staging URLs
+  explicitly; production follows Transak's documented naming convention.
+- Direct query-parameter widget launch: Transak's newer docs describe a
+  server-side Create Widget URL API
+  (`POST https://api-gateway.transak.com/api/v2/auth/session`, returns a
+  single-use 5-minute `widgetUrl` with a sessionId) as mandatory for
+  "secure widget launches" (reference/create-widget-url). The classic direct
+  query-param launch implemented here is still fully documented on the query
+  parameters page, but whether Transak enforces the session API for new
+  partner accounts must be checked during staging tests. If enforced, the
+  change is contained to `createSession` (call the session API with the same
+  widgetParams; it additionally needs the end user's IP and a
+  `referrerDomain`, plus partner IP allowlisting).
+- `defaultCryptoAmount` as a pre-fill parameter: part of Transak's classic
+  widget model; not on the query-parameter page fetched. Harmless if
+  ignored (the buyer picks an amount in-widget).
+- `filter[status]` on the orders list documents a default of COMPLETED. If
+  that default really filters the poll, non-terminal orders would be
+  invisible to `getSessionStatus` (it then conservatively reports
+  `created`); webhooks remain the primary status channel either way. Check
+  during staging tests.
+- Webhook event id ORDER_CANCELLED: the fetched webhook page lists
+  ORDER_REFUNDED but not a cancelled event id. The mapping keys on
+  `webhookData.status` (CANCELLED verified) first, and falls back to the
+  event id, so this gap is cosmetic.
+
+### 5.4 Activation checklist for Med
+
+1. Create a Transak partner account (KYB required for production) at the
+   Transak partner dashboard and obtain the staging API key and secret.
+2. Set `TRANSAK_API_KEY` and `TRANSAK_API_SECRET` (leave
+   `TRANSAK_ENVIRONMENT` unset for STAGING). `ONRAMP_PROVIDER` already
+   defaults to transak.
+3. In the Transak partner dashboard, register the webhook endpoint
+   `https://<host>/api/onramp/webhook` for order events.
+4. Run a staging purchase end to end: create an order, follow the widget
+   redirect, pay with Transak staging test cards, and confirm the session
+   reaches `completed` via webhook and the order transitions to `funded`.
+   While doing so, verify the four NEEDS VERIFICATION items in 5.3 (direct
+   widget launch accepted, production hosts, defaultCryptoAmount honored,
+   orders poll visibility of non-terminal statuses).
+5. Confirm EUR alongside USD in the widget for a UAE-based tester (the
+   decision allows either; AED not required).
+6. Amount caveat: the widget pre-fills but does not lock the purchase
+   amount, and settlement credits the order's own `token_amount` when the
+   session completes (`src/lib/onramp/settlement.ts`). Decide before
+   production whether to lock amounts (`fiatAmount` locks the fiat side) or
+   reconcile the delivered `cryptoAmount` from the webhook payload against
+   the order total.
+7. For production: request production API keys after KYB, set
+   `TRANSAK_ENVIRONMENT=PRODUCTION`, re-register the production webhook, and
+   repeat step 4 with a small real purchase.
 
 ## 6. API summary (WS4 consumers)
 

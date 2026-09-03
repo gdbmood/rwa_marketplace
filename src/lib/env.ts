@@ -27,7 +27,11 @@ export type ServerEnvName =
   | 'INDEXER_RPC_URL'
   | 'CHAIN_WEBHOOK_SECRET'
   | 'EXCHANGE_RATE_API_KEY'
-  | 'THIRDWEB_WEBHOOK_SECRET';
+  | 'THIRDWEB_WEBHOOK_SECRET'
+  | 'TRANSAK_API_KEY'
+  | 'TRANSAK_API_SECRET'
+  | 'TRANSAK_ENVIRONMENT'
+  | 'ONRAMP_PROVIDER';
 
 // Literal member accesses are required for Next.js build-time inlining.
 const publicReaders: Record<PublicEnvName, () => string | undefined> = {
@@ -132,5 +136,35 @@ export const serverEnv = {
   },
   get thirdwebWebhookSecret(): string {
     return requireServerEnv('THIRDWEB_WEBHOOK_SECRET');
+  },
+  get transakApiKey(): string {
+    return requireServerEnv('TRANSAK_API_KEY');
+  },
+  get transakApiSecret(): string {
+    return requireServerEnv('TRANSAK_API_SECRET');
+  },
+  /** STAGING (default) or PRODUCTION; switches Transak widget and API hosts. */
+  get transakEnvironment(): 'STAGING' | 'PRODUCTION' {
+    const raw = process.env.TRANSAK_ENVIRONMENT;
+    if (!raw) {
+      return 'STAGING';
+    }
+    const normalized = raw.trim().toUpperCase();
+    if (normalized !== 'STAGING' && normalized !== 'PRODUCTION') {
+      throw new Error(`TRANSAK_ENVIRONMENT must be STAGING or PRODUCTION, got "${raw}"`);
+    }
+    return normalized;
+  },
+  /** Active on-ramp provider; transak by default (TEST_MODE=1 overrides with the mock). */
+  get onrampProvider(): 'thirdweb' | 'transak' {
+    const raw = process.env.ONRAMP_PROVIDER;
+    if (!raw) {
+      return 'transak';
+    }
+    const normalized = raw.trim().toLowerCase();
+    if (normalized !== 'thirdweb' && normalized !== 'transak') {
+      throw new Error(`ONRAMP_PROVIDER must be thirdweb or transak, got "${raw}"`);
+    }
+    return normalized;
   },
 };
