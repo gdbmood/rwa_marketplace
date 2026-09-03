@@ -24,6 +24,32 @@ export async function getCursor(
   return result.data ? Number(result.data.last_block) : null;
 }
 
+/**
+ * Moves the cursor backwards explicitly. Only for chain-reset recovery: when
+ * the chain's tip is behind the stored cursor (a fresh local node, or an RPC
+ * serving a shorter history) ingestion would otherwise freeze forever,
+ * because setCursor never rewinds and the fetch range stays empty.
+ */
+export async function rewindCursor(
+  chainId: number,
+  contractAddress: string,
+  lastBlock: number,
+): Promise<void> {
+  const result = await createServiceClient()
+    .from('indexer_cursors')
+    .upsert(
+      {
+        chain_id: chainId,
+        contract_address: contractAddress.toLowerCase(),
+        last_block: lastBlock,
+      },
+      { onConflict: 'chain_id,contract_address' },
+    );
+  if (result.error) {
+    throw new Error(`indexer.rewindCursor: ${result.error.message}`);
+  }
+}
+
 /** Advances the cursor. Never moves it backwards (replays are idempotent anyway). */
 export async function setCursor(
   chainId: number,

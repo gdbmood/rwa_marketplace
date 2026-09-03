@@ -1,3 +1,10 @@
+"use client";
+
+// Client component on purpose: the sx entries below use the function form
+// ((theme) => theme.applyStyles(...)), which cannot be serialized across the
+// server/client boundary. Rendering this from a server component (for
+// example the business pages' Footer) without the directive crashes the
+// whole page render with "Functions cannot be passed to Client Components".
 import { Box } from "@mui/material";
 import Image from "next/image";
 

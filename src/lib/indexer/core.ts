@@ -14,8 +14,9 @@
  *                      from the ERC20 Transfer logs of the same transaction
  *                      (the event itself does not identify sellers), decrement
  *                      listings cheapest first, move holdings, settle the
- *                      submitted order found by tx_hash (or record a settled
- *                      order when the buyer's browser closed before
+ *                      submitted order found by tx_hash (or, after a one-cycle
+ *                      grace so a racing submitOrderTx can land, record a
+ *                      settled order when the buyer's browser closed before
  *                      submitOrderTx), write one transactions row per fill and
  *                      mark the asset sold_out at zero available supply.
  *   Transfer           plain ERC20 transfer on a known fraction token outside
@@ -47,6 +48,14 @@ const MICRO_PER_USDC = BigInt(1000000);
 const MONEY_SCALE = 6;
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+/**
+ * Retry-detail marker for a FractionBought event seen before any order row
+ * carries its tx hash. Its presence in chain_events.error on the next
+ * attempt tells the handler the grace cycle has passed and the buy really is
+ * a browser-was-closed direct purchase.
+ */
+export const AWAITING_ORDER_MARKER = 'awaiting a possible order row before chain_direct settlement';
 
 const ADDRESS_PATTERN = /^0x[0-9a-f]{40}$/;
 const DECIMAL_PATTERN = /^-?\d+(\.\d+)?$/;
@@ -189,6 +198,13 @@ export interface CoreChainEvent {
   blockNumber: number;
   logIndex: number;
   args: unknown;
+  /**
+   * Failure detail recorded by a previous processing attempt of this same
+   * event (chain_events.error). Lets a handler distinguish its first sight
+   * of an event from a retry, e.g. to defer the browser-was-closed order
+   * synthesis by one cycle.
+   */
+  previousError?: string | null;
 }
 
 /** One part of a fill: quantity taken from a specific database listing. */
@@ -254,7 +270,12 @@ export interface IndexerDeps {
 
   getOrderByTxHash(txHash: string): Promise<IndexerOrder | null>;
   settleOrder(orderId: string, patch: { txHash: string; fills: SettledFill[] }): Promise<IndexerOrder | null>;
-  createSettledOrder(input: {
+  /**
+   * Browser-was-closed case: creates a chain_direct order in submitted state
+   * with the tx hash stamped, so the normal settle path can close it AFTER the
+   * fills are recorded (settled must keep implying every fill was written).
+   */
+  createChainDirectOrder(input: {
     buyerId: string;
     assetId: string;
     quantity: number;
@@ -546,6 +567,19 @@ export async function handleFractionBought(
   }
 
   const buyerUser = await deps.getUserByWallet(buyer);
+
+  // A buy with no matching order row is usually the app racing to record its
+  // tx hash (submitOrderTx runs right after broadcast, and on a fast chain
+  // the event can be observed first). Defer exactly one cycle before treating
+  // it as a browser-was-closed direct buy, so the real order settles instead
+  // of a duplicate synthetic chain_direct order.
+  if (!order && buyerUser && !event.previousError?.includes(AWAITING_ORDER_MARKER)) {
+    return {
+      outcome: 'retry',
+      detail: `no order row yet for buy tx ${event.txHash}; ${AWAITING_ORDER_MARKER}`,
+    };
+  }
+
   const sellerUserIds = new Map<string, string | null>();
   for (const log of transferLogs) {
     if (!sellerUserIds.has(log.from)) {
@@ -586,14 +620,33 @@ export async function handleFractionBought(
     });
   }
 
-  // Fee attribution per fill: prorated from the quoted order fee when an
-  // order exists. Direct contract buys carry no fee information in the event.
+  // Fee attribution per fill: prorated from the quoted order fee when an app
+  // order exists. Direct contract buys carry no fee information in the event,
+  // so their fills keep a null fee even though a synthetic order is created.
   const fees = order
     ? prorateFee(order.platformFee, fills.map((f) => f.total))
     : fills.map(() => null);
   fills.forEach((fill, i) => {
     fill.fee = fees[i];
   });
+
+  // Browser-was-closed case: the buy confirmed on chain but no order was ever
+  // submitted. Create the chain_direct order BEFORE the fills are written so
+  // every transactions row links to it; it is settled after the loop through
+  // the same path as app orders. The platform fee charged on chain is not in
+  // the event, so it is recorded as 0 on this synthetic order.
+  let effectiveOrder = order;
+  if (!order && buyerUser) {
+    effectiveOrder = await deps.createChainDirectOrder({
+      buyerId: buyerUser.id,
+      assetId: asset.id,
+      quantity: amount,
+      quotedTotal: microToUsdc(pricePaidMicro),
+      platformFee: '0',
+      txHash: event.txHash,
+      fills,
+    });
+  }
 
   let appliedQty = 0;
   let appliedFills = 0;
@@ -671,7 +724,7 @@ export async function handleFractionBought(
     await deps.recordTransaction({
       type: 'buy',
       assetId: asset.id,
-      orderId: order ? order.id : null,
+      orderId: effectiveOrder ? effectiveOrder.id : null,
       listingId: fill.listingId,
       fromUserId: fill.sellerUserId,
       toUserId: buyerUser ? buyerUser.id : null,
@@ -698,30 +751,16 @@ export async function handleFractionBought(
     }
   }
 
-  if (order) {
-    const settled = await deps.settleOrder(order.id, { txHash: event.txHash, fills });
+  if (effectiveOrder) {
+    const settled = await deps.settleOrder(effectiveOrder.id, { txHash: event.txHash, fills });
     if (!settled) {
       await deps.writeAudit({
         action: 'indexer.order_settle_race',
         entity: 'orders',
-        entityId: order.id,
+        entityId: effectiveOrder.id,
         diff: { txHash: event.txHash },
       });
     }
-  } else if (buyerUser) {
-    // Browser-was-closed case: the buy confirmed on chain but no order was
-    // ever submitted, so record a settled order for the buyer's history.
-    // The platform fee charged on chain is not in the event, so it is
-    // recorded as 0 on this synthetic order.
-    await deps.createSettledOrder({
-      buyerId: buyerUser.id,
-      assetId: asset.id,
-      quantity: amount,
-      quotedTotal: microToUsdc(pricePaidMicro),
-      platformFee: '0',
-      txHash: event.txHash,
-      fills,
-    });
   } else {
     await deps.writeAudit({
       action: 'indexer.buy_unknown_buyer',

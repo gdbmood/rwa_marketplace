@@ -29,7 +29,7 @@ import {
   getLatestBlock,
 } from '@/lib/indexer/chain';
 import { createIndexerDeps } from '@/lib/indexer/deps';
-import { getCursor, setCursor } from '@/lib/indexer/cursor';
+import { getCursor, rewindCursor, setCursor } from '@/lib/indexer/cursor';
 
 /**
  * One ingest cycle:
@@ -41,7 +41,10 @@ import { getCursor, setCursor } from '@/lib/indexer/cursor';
  *   4. reconcile primary listings against fetchAllListings (the database
  *      follows the chain for primary listing price; quantity is clamped down
  *      to the issuer's on-chain balance because the resale book has no getter,
- *      see docs/audit/contracts.md sections 3 and 4).
+ *      see docs/audit/contracts.md sections 3 and 4). The balance for the
+ *      clamp is read at the cursor block, never at "latest", and only when
+ *      every fetched event was processed, so a buy that mined after the
+ *      fetched range cannot be applied twice (clamp plus event decrement).
  *
  * Every step is safe to replay, so overlapping cron runs or a webhook racing
  * the poller cannot double-apply anything.
@@ -111,6 +114,8 @@ export interface ProcessCounts {
   skipped: number;
   retried: number;
   failed: number;
+  /** True when the unprocessed-events queue was fully worked off this pass. */
+  drained: boolean;
 }
 
 /**
@@ -122,8 +127,15 @@ export async function processPendingEvents(
   chainId: number,
   limit: number = DEFAULT_MAX_EVENTS,
 ): Promise<ProcessCounts> {
-  const counts: ProcessCounts = { processed: 0, skipped: 0, retried: 0, failed: 0 };
+  const counts: ProcessCounts = {
+    processed: 0,
+    skipped: 0,
+    retried: 0,
+    failed: 0,
+    drained: false,
+  };
   const rows = await listUnprocessedEvents(limit);
+  counts.drained = rows.length < limit;
 
   for (const row of rows) {
     if (row.chain_id !== chainId) {
@@ -137,6 +149,7 @@ export async function processPendingEvents(
       blockNumber: row.block_number,
       logIndex: row.log_index,
       args: row.args,
+      previousError: row.error,
     };
     try {
       const result = await processChainEvent(event, deps);
@@ -157,16 +170,34 @@ export async function processPendingEvents(
   return counts;
 }
 
+export interface ReconcilePin {
+  /**
+   * Block height the database state reflects (the cursor after this cycle).
+   * Balance reads for the quantity clamp are pinned here so a buy that mined
+   * after this block, but before its event is processed, is never applied
+   * twice (once by the clamp, once by the event handler). Null when no
+   * consistent height is known; the clamp is skipped then.
+   */
+  blockNumber: number | null;
+  /**
+   * False when this cycle left unprocessed or retried events behind, meaning
+   * the database may still be behind blockNumber; the clamp is skipped then.
+   */
+  allowClamp: boolean;
+}
+
 /**
  * Reconciles primary listings against fetchAllListings. Price follows the
  * chain (updateListing rewrites nfts[nftId].pricePerFraction with no event).
  * Quantity has no on-chain getter, so the only safe correction is clamping
- * the database quantity down to the issuer's live token balance; a database
- * quantity below the balance is reported to audit_log instead of raised.
+ * the database quantity down to the issuer's token balance at the pinned
+ * block height; a database quantity below the balance is reported to
+ * audit_log instead of raised.
  */
 async function reconcilePrimaryListings(
   ctx: IndexerChainContext,
   deps: IndexerDeps,
+  pin: ReconcilePin,
 ): Promise<ReconcileCounts> {
   const counts: ReconcileCounts = { priceUpdates: 0, quantityClamps: 0, warnings: 0 };
 
@@ -211,12 +242,25 @@ async function reconcilePrimaryListings(
       }
     }
 
+    // blockNumber 0 is excluded too: thirdweb's eth_call treats a falsy
+    // block number as "latest", which would silently unpin the read.
+    if (!pin.allowClamp || pin.blockNumber === null || pin.blockNumber <= 0) {
+      // Without a consistent height the balance could include buys whose
+      // events are not processed yet; clamping would double-decrement.
+      continue;
+    }
+
     try {
       const businessWallet = await walletOfBusiness(asset.business_id);
       if (!businessWallet) {
         continue;
       }
-      const balance = await balanceOfOnChain(ctx, chainListing.erc20TokenAddress, businessWallet);
+      const balance = await balanceOfOnChain(
+        ctx,
+        chainListing.erc20TokenAddress,
+        businessWallet,
+        pin.blockNumber,
+      );
       const balanceQty = balance > BigInt(Number.MAX_SAFE_INTEGER)
         ? Number.MAX_SAFE_INTEGER
         : Number(balance);
@@ -287,7 +331,21 @@ export async function runIngestCycle(
   const startBlock = envInt('INDEXER_START_BLOCK', 0);
 
   const latestBlock = await getLatestBlock(ctx);
-  const cursor = await getCursor(ctx.chainId, ctx.marketplaceAddress);
+  let cursor = await getCursor(ctx.chainId, ctx.marketplaceAddress);
+  if (cursor !== null && cursor > latestBlock) {
+    // The chain's tip is behind the stored cursor: the local node was reset
+    // (fresh dev chain) or the RPC serves a shorter history. Without a rewind
+    // the fetch range stays empty forever and ingestion freezes. Rewinding to
+    // the tip is safe: chain_events inserts are idempotent on
+    // (chain_id, tx_hash, log_index).
+    await writeAudit({
+      actorUserId: null,
+      action: 'indexer.cursor_rewound',
+      diff: { chainId: ctx.chainId, from: cursor, to: latestBlock },
+    });
+    await rewindCursor(ctx.chainId, ctx.marketplaceAddress, latestBlock);
+    cursor = latestBlock;
+  }
   const fromBlock = (cursor ?? startBlock - 1) + 1;
   const toBlock = Math.min(latestBlock - confirmations, fromBlock + maxBlocks - 1);
 
@@ -331,9 +389,17 @@ export async function runIngestCycle(
     await setCursor(ctx.chainId, ctx.marketplaceAddress, toBlock);
   }
 
+  // The database now reflects chain events up to the advanced cursor (when
+  // every fetched event was processed). Pin the clamp there: reading balances
+  // at "latest" instead would race buys that mined after the fetched range
+  // and double-apply them (clamp now, event decrement next cycle).
+  const reflectedBlock = rangeFetched ? toBlock : (cursor ?? null);
+  const allowClamp =
+    processCounts.drained && processCounts.retried === 0 && processCounts.failed === 0;
+
   const reconcile = options.skipReconcile
     ? { priceUpdates: 0, quantityClamps: 0, warnings: 0 }
-    : await reconcilePrimaryListings(ctx, deps);
+    : await reconcilePrimaryListings(ctx, deps, { blockNumber: reflectedBlock, allowClamp });
 
   return {
     chainId: ctx.chainId,

@@ -15,7 +15,11 @@
  *      - assets hold UNIQUE nft_id / erc20_token_address values that the
  *        fresh chain re-issues (nft ids restart at 0, token addresses come
  *        from the marketplace's reset nonce), so the next mint promotion
- *        would violate those constraints.
+ *        would violate those constraints;
+ *      - transactions and orders rows carry tx hashes the fresh chain
+ *        reproduces exactly (same wallets, nonces, calldata, fees), so the
+ *        indexer would treat new buys as already-applied replays or
+ *        already-settled orders.
  *    The guard detects rows whose transactions the running node has never
  *    seen and retires them (events + cursors deleted, assets delisted with
  *    their chain identity nulled, their listings canceled). Seeded fake
@@ -155,6 +159,8 @@ export interface StaleResetReport {
   staleEventTxCount: number;
   cursorsDeleted: boolean;
   retiredAssetIds: string[];
+  staleTransactionCount: number;
+  staleOrderTxCount: number;
 }
 
 export async function resetStaleChainState(db: ServiceClient): Promise<StaleResetReport> {
@@ -162,8 +168,21 @@ export async function resetStaleChainState(db: ServiceClient): Promise<StaleRese
     staleEventTxCount: 0,
     cursorsDeleted: false,
     retiredAssetIds: [],
+    staleTransactionCount: 0,
+    staleOrderTxCount: 0,
   };
   const latest = await latestBlockNumber();
+
+  // One node lookup per unique hash across all the passes below.
+  const knownTx = new Map<string, boolean>();
+  const isKnownTx = async (hash: string): Promise<boolean> => {
+    let known = knownTx.get(hash);
+    if (known === undefined) {
+      known = await txKnownToNode(hash);
+      knownTx.set(hash, known);
+    }
+    return known;
+  };
 
   // 1. chain_events rows from a chain this node has never seen.
   const eventsResult = await db
@@ -177,7 +196,7 @@ export async function resetStaleChainState(db: ServiceClient): Promise<StaleRese
   const txHashes = Array.from(new Set(eventsResult.data.map((row) => row.tx_hash)));
   const staleHashes: string[] = [];
   for (const hash of txHashes) {
-    if (!(await txKnownToNode(hash))) {
+    if (!(await isKnownTx(hash))) {
       staleHashes.push(hash);
     }
   }
@@ -232,7 +251,7 @@ export async function resetStaleChainState(db: ServiceClient): Promise<StaleRese
     if (!asset.mint_tx_hash) {
       continue; // unknown provenance; leave it alone
     }
-    if (await txKnownToNode(asset.mint_tx_hash)) {
+    if (await isKnownTx(asset.mint_tx_hash)) {
       continue; // lives on the current chain
     }
     const update = await db
@@ -261,6 +280,66 @@ export async function resetStaleChainState(db: ServiceClient): Promise<StaleRese
       throw new Error(`stale guard: listing cancel failed: ${listings.error.message}`);
     }
     log(`retired ${report.retiredAssetIds.length} asset(s) minted on a dead chain`);
+  }
+
+  // 4. transactions rows from a dead chain. The (tx_hash, log_index) pair is
+  //    the indexer's per-fill idempotency marker, and a fresh deterministic
+  //    chain reproduces old tx hashes exactly (same wallets, nonces, calldata
+  //    and fees), so a leftover row makes the indexer treat a brand new buy
+  //    as an already-applied replay: no listing decrement, no holdings move,
+  //    no ledger row. Delete the dead-chain ledger rows outright.
+  const txRowsResult = await db
+    .from('transactions')
+    .select('id, tx_hash')
+    .not('tx_hash', 'is', null)
+    .limit(5000);
+  if (txRowsResult.error) {
+    throw new Error(`stale guard: transactions read failed: ${txRowsResult.error.message}`);
+  }
+  const staleTxRowIds: string[] = [];
+  for (const row of txRowsResult.data) {
+    if (row.tx_hash && !(await isKnownTx(row.tx_hash))) {
+      staleTxRowIds.push(row.id);
+    }
+  }
+  if (staleTxRowIds.length > 0) {
+    for (const part of chunk(staleTxRowIds, 100)) {
+      const del = await db.from('transactions').delete().in('id', part);
+      if (del.error) {
+        throw new Error(`stale guard: transactions delete failed: ${del.error.message}`);
+      }
+    }
+    report.staleTransactionCount = staleTxRowIds.length;
+    log(`removed ${staleTxRowIds.length} ledger row(s) from a dead chain`);
+  }
+
+  // 5. orders carrying a dead-chain tx_hash. getOrderByTxHash would match the
+  //    old (usually settled) order for a colliding fresh transaction and the
+  //    indexer would skip the whole event as already settled. Null the hash;
+  //    the order itself stays as history.
+  const orderRowsResult = await db
+    .from('orders')
+    .select('id, tx_hash')
+    .not('tx_hash', 'is', null)
+    .limit(5000);
+  if (orderRowsResult.error) {
+    throw new Error(`stale guard: orders read failed: ${orderRowsResult.error.message}`);
+  }
+  const staleOrderIds: string[] = [];
+  for (const row of orderRowsResult.data) {
+    if (row.tx_hash && !(await isKnownTx(row.tx_hash))) {
+      staleOrderIds.push(row.id);
+    }
+  }
+  if (staleOrderIds.length > 0) {
+    for (const part of chunk(staleOrderIds, 100)) {
+      const upd = await db.from('orders').update({ tx_hash: null }).in('id', part);
+      if (upd.error) {
+        throw new Error(`stale guard: order tx_hash reset failed: ${upd.error.message}`);
+      }
+    }
+    report.staleOrderTxCount = staleOrderIds.length;
+    log(`cleared dead-chain tx hashes on ${staleOrderIds.length} order(s)`);
   }
 
   return report;

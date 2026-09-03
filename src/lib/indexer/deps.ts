@@ -260,7 +260,7 @@ export function createIndexerDeps(ctx: IndexerChainContext): IndexerDeps {
       return row ? toIndexerOrder(row) : null;
     },
 
-    async createSettledOrder(input) {
+    async createChainDirectOrder(input) {
       const created = await createOrder({
         buyerId: input.buyerId,
         assetId: input.assetId,
@@ -270,10 +270,12 @@ export function createIndexerDeps(ctx: IndexerChainContext): IndexerDeps {
         paymentMethod: 'chain_direct',
         fills: fillsToJson(input.fills),
       });
-      const settled = await transitionOrder(created.id, ['created'], 'settled', {
+      // Submitted, not settled: the handler settles it only after every fill's
+      // transactions row is written, keeping replays able to finish the work.
+      const submitted = await transitionOrder(created.id, ['created'], 'submitted', {
         tx_hash: input.txHash,
       });
-      return settled ? toIndexerOrder(settled) : toIndexerOrder(created);
+      return submitted ? toIndexerOrder(submitted) : toIndexerOrder(created);
     },
 
     async recordTransaction(input) {

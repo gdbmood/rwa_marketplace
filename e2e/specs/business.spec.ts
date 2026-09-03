@@ -109,7 +109,8 @@ test.describe.serial('business journey', () => {
     await loginJourneyBusiness(page);
 
     await page.goto(bizUrl('/profile'));
-    await expect(page.getByText('Account details')).toBeVisible({ timeout: 30_000 });
+    // exact: the "Edit account details" button substring-matches otherwise.
+    await expect(page.getByText('Account details', { exact: true })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId('kyb-not-approved')).toBeVisible();
 
     await page.getByRole('button', { name: 'Edit account details' }).click();
@@ -535,7 +536,10 @@ test.describe.serial('business journey', () => {
 
     // Revenue metrics render (zero sales for this run's asset, but visible).
     await expect(page.getByText('Total Raised Funds')).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByText('Fractions Sold')).toBeVisible();
+    // exact + first: per-asset cards ("Fractions sold") and the transactions
+    // table header also carry this text once several run-accumulated assets
+    // exist, which a bare getByText would trip over in strict mode.
+    await expect(page.getByText('Fractions Sold', { exact: true }).first()).toBeVisible();
 
     // The transaction history carries this run's full lifecycle.
     await expect(page.getByText('Transactions', { exact: true })).toBeVisible();

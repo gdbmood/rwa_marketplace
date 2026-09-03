@@ -28,6 +28,12 @@ let cached: CachedRates | null = null;
  * rates are served while stale, and only a validated payload is stored.
  */
 export async function currencyRate(): Promise<CurrencyRates> {
+  if (process.env.TEST_MODE === '1') {
+    // Test mode mocks every external provider (see e2e/README.md): fixed
+    // rates, no network call, no EXCHANGE_RATE_API_KEY needed.
+    return { USD: 1, EUR: 0.9, AED: 3.6725 };
+  }
+
   const now = Math.floor(Date.now() / 1000);
   if (cached && now <= cached.refreshAfterUnix) {
     return cached.rates;

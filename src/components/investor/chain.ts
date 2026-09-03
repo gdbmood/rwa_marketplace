@@ -1,6 +1,12 @@
 'use client';
 
-import { prepareContractCall, sendAndConfirmTransaction, toUnits } from 'thirdweb';
+import {
+  prepareContractCall,
+  sendAndConfirmTransaction,
+  sendTransaction,
+  toUnits,
+  waitForReceipt,
+} from 'thirdweb';
 import type { Account, Wallet } from 'thirdweb/wallets';
 import { contract, getContractByAddress } from '@/lib/thirdWebClient';
 import { buyNFT, sellNFT, unlistNFT } from '@/utils/ABI';
@@ -36,19 +42,40 @@ export async function approveUsdcSpend(
   return receipt.transactionHash;
 }
 
-/** buyFractions(nftId, amount). Returns the transaction hash. */
-export async function buyFractionsOnChain(
+export interface SentBuyTransaction {
+  transactionHash: string;
+  /** Resolves once the transaction is mined; throws when it reverted. */
+  confirmed: () => Promise<void>;
+}
+
+/**
+ * buyFractions(nftId, amount), split into broadcast and confirmation. The
+ * hash is returned as soon as the transaction is sent so the caller can
+ * report it through submitOrderTx BEFORE the indexer can observe the mined
+ * transaction (order state machine: the order must sit in submitted with its
+ * tx_hash first, or the indexer treats the buy as browser-was-closed and
+ * synthesizes a duplicate chain_direct order while the real one hangs).
+ */
+export async function sendBuyFractions(
   account: Account,
   nftId: number,
   quantity: number,
-): Promise<string> {
+): Promise<SentBuyTransaction> {
   const transaction = prepareContractCall({
     contract,
     method: buyNFT,
     params: [BigInt(nftId), BigInt(quantity)],
   });
-  const receipt = await sendAndConfirmTransaction({ transaction, account });
-  return receipt.transactionHash;
+  const result = await sendTransaction({ transaction, account });
+  return {
+    transactionHash: result.transactionHash,
+    confirmed: async () => {
+      const receipt = await waitForReceipt(result);
+      if (receipt.status !== 'success') {
+        throw new Error('The purchase transaction reverted on chain');
+      }
+    },
+  };
 }
 
 /** Approves the marketplace to move `quantity` fraction tokens. */

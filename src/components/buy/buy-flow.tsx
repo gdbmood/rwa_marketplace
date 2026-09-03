@@ -31,9 +31,10 @@ import {
 } from '@/actions/orders';
 import {
   approveUsdcSpend,
-  buyFractionsOnChain,
   chainErrorMessage,
+  sendBuyFractions,
   toMicroUsdcUnits,
+  type SentBuyTransaction,
 } from '@/components/investor/chain';
 import {
   explorerTxUrl,
@@ -229,7 +230,7 @@ export default function BuyFlow({ asset, listings, quantity, viewer }: BuyFlowPr
         return;
       }
 
-      let txHash: string;
+      let sent: SentBuyTransaction;
       try {
         setPhase('approving');
         const approveAmount =
@@ -237,7 +238,7 @@ export default function BuyFlow({ asset, listings, quantity, viewer }: BuyFlowPr
         await approveUsdcSpend(account, approveAmount);
 
         setPhase('buying');
-        txHash = await buyFractionsOnChain(account, asset.nft_id, quantity);
+        sent = await sendBuyFractions(account, asset.nft_id, quantity);
       } catch (chainError) {
         const message = chainErrorMessage(chainError);
         await failOrder(activeOrder.id, message).catch(() => null);
@@ -245,16 +246,30 @@ export default function BuyFlow({ asset, listings, quantity, viewer }: BuyFlowPr
         return;
       }
 
+      // Report the hash BEFORE waiting for the receipt: on a fast chain the
+      // transaction can mine instantly, and the indexer must find this order
+      // in submitted instead of synthesizing a duplicate chain_direct order.
       setPhase('submitting');
-      const submitted = await submitOrderTx(activeOrder.id, txHash);
+      const submitted = await submitOrderTx(activeOrder.id, sent.transactionHash);
       if (!submitted.ok) {
         // The chain purchase went through; the indexer will still settle it.
         fail(
-          `The purchase transaction was sent (${txHash.slice(0, 10)}...) but reporting it failed: ${submitted.error.message}. Check your portfolio in a minute.`,
+          `The purchase transaction was sent (${sent.transactionHash.slice(0, 10)}...) but reporting it failed: ${submitted.error.message}. Check your portfolio in a minute.`,
         );
         return;
       }
       setOrder(submitted.data);
+
+      try {
+        await sent.confirmed();
+      } catch (chainError) {
+        // Broadcast succeeded but the transaction reverted at mining time:
+        // fail the submitted order with the chain's reason.
+        const message = chainErrorMessage(chainError);
+        await failOrder(activeOrder.id, message).catch(() => null);
+        fail(message);
+        return;
+      }
       await pollSettlement(submitted.data.id);
     },
     [account, asset.nft_id, quantity, fail, pollSettlement],

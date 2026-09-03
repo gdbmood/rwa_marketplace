@@ -26,6 +26,7 @@ import '../scripts/lib/bootstrap';
 
 import { spawnSync } from 'node:child_process';
 import {
+  APP_PORT,
   CHAIN_RPC_URL,
   REPO_ROOT,
   ensureChainStack,
@@ -34,6 +35,7 @@ import {
   type ChainJson,
 } from './stack';
 import { HARDHAT_ACCOUNT_INDEX, WALLETS, WALLET_ROLES } from './wallets';
+import { resetStaleChainStateWithServiceClient } from './helpers/investor';
 
 function log(message: string): void {
   console.log(`[e2e-setup] ${message}`);
@@ -126,11 +128,105 @@ function startIndexer(chain: ChainJson): void {
   });
 }
 
+/**
+ * Pre-compiles the app's routes AND fetches their client chunk assets before
+ * any spec opens a browser. Two reasons:
+ *   - next dev compiles routes on first hit, so cold pages otherwise cost
+ *     5-15s inside test timeouts;
+ *   - a browser that requests a client chunk while the compiler is still
+ *     emitting it can receive a truncated file; the resulting SyntaxError
+ *     kills hydration permanently (spinner forever), which is exactly the
+ *     "first navigation of a cold run hangs regardless of timeout" failure.
+ * Fetching every /_next asset referenced by the warmed pages guarantees the
+ * chunks are fully emitted and cached before a real browser asks for them.
+ * Best effort: a failed warm never fails the run.
+ */
+async function warmAppRoutes(): Promise<void> {
+  const mainOrigin = `http://localhost:${APP_PORT}`;
+  const businessOrigin = `http://business.localhost:${APP_PORT}`;
+  const dummyId = '00000000-0000-0000-0000-000000000000';
+  const targets = [
+    `${mainOrigin}/`,
+    `${mainOrigin}/marketplace`,
+    `${mainOrigin}/profile`,
+    `${mainOrigin}/portfolio`,
+    `${mainOrigin}/settings`,
+    `${mainOrigin}/asset/${dummyId}`,
+    `${mainOrigin}/asset/${dummyId}/docs`,
+    `${mainOrigin}/asset/${dummyId}/buy/1`,
+    `${mainOrigin}/onramp/mock`,
+    `${businessOrigin}/dashboard`,
+    `${businessOrigin}/profile`,
+    `${businessOrigin}/list-new-asset`,
+    `${businessOrigin}/settings`,
+    `${businessOrigin}/verify-business`,
+    // API routes: a GET may 405 on POST-only handlers, but the module still
+    // compiles, which is all the warm-up needs (e.g. the first onramp webhook
+    // call otherwise pays its whole compile inside a test's expect window).
+    `${mainOrigin}/api/onramp/create`,
+    `${mainOrigin}/api/onramp/status`,
+    `${mainOrigin}/api/onramp/webhook`,
+    `${mainOrigin}/api/sumsub-webhook`,
+    `${mainOrigin}/api/rls-token`,
+    `${mainOrigin}/api/chain-webhook`,
+  ];
+  const started = Date.now();
+  let pagesWarmed = 0;
+  let assetsWarmed = 0;
+  for (const url of targets) {
+    try {
+      const origin = new URL(url).origin;
+      const response = await fetch(url, { redirect: 'manual' });
+      const html = await response.text();
+      pagesWarmed += 1;
+      const assets = new Set<string>();
+      const assetPattern = /(?:src|href)="(\/_next\/[^"]+)"/g;
+      for (let match = assetPattern.exec(html); match; match = assetPattern.exec(html)) {
+        assets.add(match[1].replace(/&amp;/g, '&'));
+      }
+      await Promise.all(
+        Array.from(assets, (asset) =>
+          fetch(`${origin}${asset}`)
+            .then((res) => res.arrayBuffer())
+            .then(() => {
+              assetsWarmed += 1;
+            })
+            .catch(() => undefined),
+        ),
+      );
+    } catch {
+      // Warming is best effort; the specs still work against cold routes,
+      // just slower and with a small chunk-race window.
+    }
+  }
+  log(
+    `warmed ${pagesWarmed}/${targets.length} route(s) and ${assetsWarmed} client asset(s) ` +
+      `in ${Math.round((Date.now() - started) / 1000)}s`,
+  );
+}
+
 export default async function globalSetup(): Promise<void> {
   assertRequiredEnv();
   const chain = await ensureChainStack();
   assertWalletAlignment(chain);
+
+  // Run-level stale-chain guard (the "recommended long-term home" noted in
+  // e2e/helpers/investor.ts): the remote database survives runs while the
+  // hardhat chain does not, and deterministic deploys re-issue the same nft
+  // ids and token addresses. Without this, the FIRST mint of a run collides
+  // with an active asset row left by a previous run (same erc20 token
+  // address), the indexer skips the promotion as "already promoted", and
+  // every spec that mints hangs. Runs before the seed and the indexer so
+  // both start from a database consistent with the current chain.
+  const stale = await resetStaleChainStateWithServiceClient();
+  log(
+    `stale-chain guard: ${stale.staleEventTxCount} dead-chain event tx(es) removed, ` +
+      `cursors ${stale.cursorsDeleted ? 'reset' : 'kept'}, ` +
+      `${stale.retiredAssetIds.length} asset(s) retired`,
+  );
+
   runSeed();
   startIndexer(chain);
+  await warmAppRoutes();
   log('stack ready: chain on 8545, app on 3100, indexer polling every 2s');
 }

@@ -5,6 +5,7 @@
  */
 
 import {
+  AWAITING_ORDER_MARKER,
   type CoreChainEvent,
   type IndexerAsset,
   type IndexerDeps,
@@ -92,7 +93,7 @@ function createMockDeps(overrides: Partial<IndexerDeps> = {}): jest.Mocked<Index
     unlockHoldingQuantity: jest.fn().mockResolvedValue(null),
     getOrderByTxHash: jest.fn().mockResolvedValue(null),
     settleOrder: jest.fn().mockResolvedValue(null),
-    createSettledOrder: jest.fn().mockResolvedValue(null),
+    createChainDirectOrder: jest.fn().mockResolvedValue(null),
     recordTransaction: jest.fn().mockResolvedValue(undefined),
     transactionExists: jest.fn().mockResolvedValue(false),
     writeAudit: jest.fn().mockResolvedValue(undefined),
@@ -291,7 +292,7 @@ describe('handleFractionBought', () => {
     expect(deps.updateAssetSupply).toHaveBeenCalledWith(ASSET.id, 990);
     expect(deps.setAssetStatus).not.toHaveBeenCalled();
     expect(deps.settleOrder).toHaveBeenCalledWith('order-1', expect.objectContaining({ txHash: TX_HASH }));
-    expect(deps.createSettledOrder).not.toHaveBeenCalled();
+    expect(deps.createChainDirectOrder).not.toHaveBeenCalled();
   });
 
   it('splits multi-seller fills per transfer log with prorated fees', async () => {
@@ -363,7 +364,12 @@ describe('handleFractionBought', () => {
       getActiveListingsForAsset: jest.fn().mockResolvedValue([listing({ quantity: 10 })]),
     });
 
-    const result = await handleFractionBought(boughtEvent, deps);
+    // No order row exists: the first sight defers one cycle (grace for a
+    // racing submitOrderTx), the retry with the marker settles for real.
+    const result = await handleFractionBought(
+      { ...boughtEvent, previousError: AWAITING_ORDER_MARKER },
+      deps,
+    );
     expect(result.outcome).toBe('processed');
     expect(deps.updateAssetSupply).toHaveBeenCalledWith(ASSET.id, 0);
     expect(deps.setAssetStatus).toHaveBeenCalledWith(ASSET.id, 'sold_out');
@@ -380,12 +386,24 @@ describe('handleFractionBought', () => {
       ),
       getActiveListingsForAsset: jest.fn().mockResolvedValue([listing({})]),
       getOrderByTxHash: jest.fn().mockResolvedValue(null),
-      createSettledOrder: jest.fn().mockResolvedValue({ id: 'order-new', status: 'settled' }),
+      createChainDirectOrder: jest.fn().mockResolvedValue({ id: 'order-new', status: 'submitted' }),
     });
 
-    const result = await handleFractionBought(boughtEvent, deps);
+    // First sight without an order row: one-cycle grace, nothing mutated.
+    const deferred = await handleFractionBought(boughtEvent, deps);
+    expect(deferred.outcome).toBe('retry');
+    expect(deferred.detail).toContain(AWAITING_ORDER_MARKER);
+    expect(deps.decrementListingQuantity).not.toHaveBeenCalled();
+    expect(deps.recordTransaction).not.toHaveBeenCalled();
+    expect(deps.createChainDirectOrder).not.toHaveBeenCalled();
+
+    // Retry after the grace cycle (marker recorded on the event row).
+    const result = await handleFractionBought(
+      { ...boughtEvent, previousError: deferred.detail },
+      deps,
+    );
     expect(result.outcome).toBe('processed');
-    expect(deps.createSettledOrder).toHaveBeenCalledWith(
+    expect(deps.createChainDirectOrder).toHaveBeenCalledWith(
       expect.objectContaining({
         buyerId: 'user-buyer',
         assetId: ASSET.id,
@@ -394,7 +412,7 @@ describe('handleFractionBought', () => {
         txHash: TX_HASH,
       }),
     );
-    expect(deps.settleOrder).not.toHaveBeenCalled();
+    expect(deps.settleOrder).toHaveBeenCalledWith('order-new', expect.objectContaining({ txHash: TX_HASH }));
   });
 
   it('is idempotent: replayed fills apply no mutations', async () => {

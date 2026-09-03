@@ -12,6 +12,7 @@ import {
 import type { Chain } from 'thirdweb/chains';
 import {
   eth_blockNumber,
+  eth_call,
   eth_getLogs,
   eth_getTransactionByHash,
   eth_getTransactionReceipt,
@@ -369,12 +370,30 @@ export async function fetchAllListingsOnChain(
   }));
 }
 
-/** balanceOf(wallet) on a fraction token, as a bigint fraction count. */
+const BALANCE_OF_SELECTOR = '0x70a08231';
+
+/**
+ * balanceOf(wallet) on a fraction token, as a bigint fraction count. When
+ * blockNumber is given the balance is read at that exact height (via a raw
+ * eth_call, which thirdweb's readContract cannot pin), so callers can compare
+ * chain state against database state that reflects events up to a known
+ * block instead of racing a moving head.
+ */
 export async function balanceOfOnChain(
   ctx: IndexerChainContext,
   tokenAddress: string,
   wallet: string,
+  blockNumber?: number,
 ): Promise<bigint> {
+  if (blockNumber !== undefined) {
+    const paddedWallet = stripHex(wallet).toLowerCase().padStart(64, '0');
+    const result = await eth_call(ctx.rpc, {
+      to: tokenAddress as `0x${string}`,
+      data: `${BALANCE_OF_SELECTOR}${paddedWallet}` as `0x${string}`,
+      blockNumber,
+    });
+    return result === '0x' ? BigInt(0) : BigInt(result);
+  }
   const tokenContract = getContract({ client: ctx.client, chain: ctx.chain, address: tokenAddress });
   return readContract({
     contract: tokenContract,

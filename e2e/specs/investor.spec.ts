@@ -61,6 +61,23 @@ function cardFail(): AssetRow {
   return failAsset;
 }
 
+/**
+ * Renders every holding card on the portfolio's performance tab. The page
+ * paginates holdings 4 at a time behind a "View More" button and holdings
+ * accumulate across runs in the shared remote database, so this run's asset
+ * can start beyond the first page. Call after navigating to /portfolio and
+ * before locating a holding card.
+ */
+async function revealAllHoldings(page: import('@playwright/test').Page): Promise<void> {
+  await expect(
+    page.getByTestId('portfolio-holding').first().or(page.getByText('No fractions yet')),
+  ).toBeVisible({ timeout: 30_000 });
+  const viewMore = page.getByRole('button', { name: 'View More' });
+  for (let i = 0; i < 30 && (await viewMore.isVisible()); i += 1) {
+    await viewMore.click();
+  }
+}
+
 test.describe('investor journeys', () => {
   test('00 setup: stale-chain guard, on-chain mint, card-fail asset', async ({ db }) => {
     test.setTimeout(240_000);
@@ -92,7 +109,13 @@ test.describe('investor journeys', () => {
     expect(user!.type).toBe('retail');
 
     await page.goto('/profile');
-    await expect(page.getByText('Account details')).toBeVisible();
+    // exact: the "Edit account details" button substring-matches otherwise.
+    // 60s: this is the run's first browser navigation, so it absorbs the
+    // whole next-dev cold start (middleware + page compile + the very first
+    // hydration of the 17k-module vendor bundle).
+    await expect(page.getByText('Account details', { exact: true })).toBeVisible({
+      timeout: 60_000,
+    });
     // The session is visible in the UI (navbar shows the test wallet as logged in).
     await expect(page.getByTestId('test-wallet-logout')).toBeVisible();
 
@@ -121,8 +144,9 @@ test.describe('investor journeys', () => {
     const ourCard = cards.filter({ hasText: MAIN_ASSET_NAME });
 
     // Search narrows to the run's asset; the card carries the KYC badge.
+    // 30s on the first assertion: first hit of /marketplace cold-compiles.
     await page.getByPlaceholder('Search for assets').fill(MAIN_ASSET_NAME);
-    await expect(ourCard).toHaveCount(1);
+    await expect(ourCard).toHaveCount(1, { timeout: 30_000 });
     await expect(ourCard.getByText('KYC required')).toBeVisible();
     await page.getByPlaceholder('Search for assets').fill('');
 
@@ -260,8 +284,10 @@ test.describe('investor journeys', () => {
     // Portfolio shows the holding with the average entry price.
     await page.getByRole('button', { name: 'Go to portfolio' }).click();
     await page.waitForURL('**/portfolio');
+    await revealAllHoldings(page);
     const card = page.getByTestId('portfolio-holding').filter({ hasText: MAIN_ASSET_NAME });
-    await expect(card).toHaveCount(1);
+    // 30s on the first assertion: first hit of /portfolio cold-compiles.
+    await expect(card).toHaveCount(1, { timeout: 30_000 });
     await expect(card.getByText(`3 / ${MAIN_ASSET_SUPPLY}`)).toBeVisible();
     await expect(card.getByText('Average entry price')).toBeVisible();
     await expect(card.getByText('10 USDC')).toBeVisible();
@@ -296,7 +322,9 @@ test.describe('investor journeys', () => {
     await popup.waitForLoadState();
     await expect(popup.getByText('Mock payment provider')).toBeVisible();
     await popup.getByRole('button', { name: 'Complete payment' }).click();
-    await expect(popup.getByText(/Payment completed/)).toBeVisible();
+    // 30s: the click fires the first POST to /api/onramp/webhook, whose cold
+    // compile in next dev queues behind the status route's compile.
+    await expect(popup.getByText(/Payment completed/)).toBeVisible({ timeout: 30_000 });
     await popup.close();
 
     // funded -> the purchase executes automatically -> indexer settles.
@@ -374,6 +402,7 @@ test.describe('investor journeys', () => {
     const seller = (await db().userByWallet(wallet.address))!;
 
     await page.goto('/portfolio');
+    await revealAllHoldings(page);
     const card = page.getByTestId('portfolio-holding').filter({ hasText: MAIN_ASSET_NAME });
     await card.getByRole('button', { name: 'Sell', exact: true }).click();
 
@@ -418,6 +447,7 @@ test.describe('investor journeys', () => {
     const seller = (await db().userByWallet(wallet.address))!;
 
     await page.goto('/portfolio');
+    await revealAllHoldings(page);
     const card = page.getByTestId('portfolio-holding').filter({ hasText: MAIN_ASSET_NAME });
     await card.getByRole('button', { name: 'Update price' }).click();
 
@@ -447,6 +477,7 @@ test.describe('investor journeys', () => {
     const seller = (await db().userByWallet(wallet.address))!;
 
     await page.goto('/portfolio');
+    await revealAllHoldings(page);
     const card = page.getByTestId('portfolio-holding').filter({ hasText: MAIN_ASSET_NAME });
     await card.getByRole('button', { name: 'Unlist' }).click();
 
@@ -490,6 +521,7 @@ test.describe('investor journeys', () => {
     const recipient = (await db().userByWallet(recipientWallet.address))!;
 
     await page.goto('/portfolio');
+    await revealAllHoldings(page);
     const card = page.getByTestId('portfolio-holding').filter({ hasText: MAIN_ASSET_NAME });
     await card.getByRole('button', { name: 'Send fractions' }).click();
 
@@ -527,6 +559,7 @@ test.describe('investor journeys', () => {
     await loginAs(page, 'investor2');
     await page.goto('/portfolio');
 
+    await revealAllHoldings(page);
     const card = page.getByTestId('portfolio-holding').filter({ hasText: MAIN_ASSET_NAME });
     await expect(card).toHaveCount(1);
     await expect(card.getByText(`1 / ${MAIN_ASSET_SUPPLY}`)).toBeVisible();
@@ -574,8 +607,8 @@ test.describe('investor journeys', () => {
     const wallet = await loginAs(page, 'investor1');
 
     await page.goto('/settings');
-    await page.getByLabel('Currency').click();
-    await page.getByLabel('Currency').press('ArrowDown'); // guarantees the listbox is open
+    await page.getByRole('combobox', { name: 'Currency' }).click();
+    await page.getByRole('combobox', { name: 'Currency' }).press('ArrowDown'); // guarantees the listbox is open
     await page.getByRole('option', { name: 'AED' }).click();
     await waitFor(
       async () => {
@@ -593,8 +626,8 @@ test.describe('investor journeys', () => {
 
     // Restore USD so the rest of the suite (and future runs) see the default.
     await page.goto('/settings');
-    await page.getByLabel('Currency').click();
-    await page.getByLabel('Currency').press('ArrowDown');
+    await page.getByRole('combobox', { name: 'Currency' }).click();
+    await page.getByRole('combobox', { name: 'Currency' }).press('ArrowDown');
     await page.getByRole('option', { name: 'USD' }).click();
     await waitFor(
       async () => {
@@ -673,6 +706,7 @@ test.describe('investor journeys', () => {
     await page.reload();
 
     // State intact: holdings and profile survived the logout.
+    await revealAllHoldings(page);
     const card = page.getByTestId('portfolio-holding').filter({ hasText: MAIN_ASSET_NAME });
     await expect(card).toHaveCount(1);
     await expect(card.getByText(`4 / ${MAIN_ASSET_SUPPLY}`)).toBeVisible();
