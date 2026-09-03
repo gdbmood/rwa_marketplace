@@ -131,3 +131,51 @@ API key, indexer RPC, cron secret) is documented in .env.example and in the
 handover document section 6; Med obtains those, see docs/handover/HANDOVER.md.
 Test mode (local hardhat chain, test login, mock onramp) keeps the e2e suite
 independent of all of these; see docs/architecture/IMPLEMENTATION_PLAN.md.
+
+## Phases 8 to 11: Verification, demos, handover, PR (2026-09-03, done)
+
+Verification, all on the committed branch:
+- typecheck clean, lint passing (warnings only), 167 of 167 unit tests, clean
+  production build from an empty .next.
+- Playwright suite: 37 of 37 passing in one run (3.4 minutes), covering every
+  business and investor function plus the three system guarantees, finishing
+  with the chain reconciliation gate reporting zero unexplained diffs.
+- Two root causes fixed during stabilization, both recorded because they matter
+  for whoever runs the suite next:
+  1. The suite now serves a production build (.next-e2e) instead of next dev.
+     On-demand compilation was putting 13 to 41 second delays inside test
+     timeouts (measured on the on-ramp webhook and status routes), which made
+     the run flaky and aborted later serial tests. Runtime dropped from about
+     17 minutes to under 4. E2E_DEV=1 restores the dev server.
+  2. HARDHAT_PRIVATE_KEYS[4] in contracts/scripts/deploy_local.ts was corrupted
+     and derived the wrong address, so investor2 signed from an unfunded
+     account ("balance is: 0"). All ten keys are now verified against their
+     addresses, and the deploy asserts the pairing so this fails loudly.
+
+Phase 9: 31 demo videos in docs/demos (3.2 MB, committed directly, no Storage
+upload needed) plus docs/demos/INDEX.md. Recorded by playwright.demo.config.ts
+at 400 ms slow motion against the real stack; only passing takes are converted.
+The walkthrough (00-full-journey.mp4) runs the whole product in one continuous
+clip: business registers, verifies, drafts, mints and lists; investor buys with
+a card through the on-ramp and resells by undercutting the primary listing; a
+second investor buys the resale.
+
+Phase 10: docs/FRACTIONAIRE_RELEASE_HANDOVER.pdf, 16 pages, rendered from
+docs/handover/HANDOVER.md by scripts/make-handover-pdf.ts (mermaid diagrams as
+real SVG, guards that fail the render on raw markdown or an em dash). Video
+links wired in by scripts/link-demos-in-handover.ts, which fails if any
+placeholder is left unmatched.
+
+Correction recorded during this phase: "buy with another token via swap" is NOT
+implemented. The checkout shows a Swap tab stating it is coming soon. It never
+worked in the legacy app either, where the token picker was commented out and
+its Bridge.Buy branch was unreachable. Documented in the handover, section 9
+item 10, with the implementation sketch and the reason it was not built blind
+(thirdweb Bridge has no local chain support, so it could not have been
+verified here).
+
+Phase 11: PR opened at https://github.com/fractionaire/rwa_marketplace/pull/1
+(316 files, +56463, -13207). The source branch lives on the fork
+gdbmood/rwa_marketplace because this account has read-only access to
+fractionaire/rwa_marketplace; the mirror pushes to the other two fractionaire
+repos succeeded because push is granted on those. Not merged, as instructed.
