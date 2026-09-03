@@ -19,6 +19,7 @@
     "@mui/material": "^6.4.7",
     "@mui/material-nextjs": "^6.4.3",
     "@sumsub/websdk-react": "^2.3.13",
+    "@supabase/supabase-js": "^2.114.0",
     "axios": "^1.8.1",
     "firebase": "^11.4.0",
     "firebase-admin": "^13.2.0",
@@ -30,6 +31,7 @@
     "react-dropzone": "^14.3.8",
     "react-firebase-hooks": "^5.1.1",
     "react-responsive-carousel": "^3.2.23",
+    "server-only": "^0.0.1",
     "thirdweb": "^5.105.37",
     "zustand": "^5.0.3"
   },
