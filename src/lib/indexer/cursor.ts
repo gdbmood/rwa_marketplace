@@ -1,39 +1,23 @@
 import 'server-only';
 
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { createServiceClient } from '@/lib/supabase/server';
 
 /**
  * Ingestion cursor persistence for the indexer, backed by the
  * indexer_cursors table (supabase/migrations/20260903000008_indexer_cursor.sql).
- *
- * The table is not yet part of the generated src/types/database.ts (the
- * migration ships as a file and is applied at integration), so this module
- * uses an untyped client for these two queries only. Once the types are
- * regenerated this cast can be dropped.
  */
-
-function untypedDb(): SupabaseClient {
-  return createServiceClient() as unknown as SupabaseClient;
-}
-
-interface CursorRow {
-  chain_id: number;
-  contract_address: string;
-  last_block: number;
-}
 
 /** Last ingested block for (chainId, contractAddress), or null when unset. */
 export async function getCursor(
   chainId: number,
   contractAddress: string,
 ): Promise<number | null> {
-  const result = await untypedDb()
+  const result = await createServiceClient()
     .from('indexer_cursors')
     .select('chain_id, contract_address, last_block')
     .eq('chain_id', chainId)
     .eq('contract_address', contractAddress.toLowerCase())
-    .maybeSingle<CursorRow>();
+    .maybeSingle();
   if (result.error) {
     throw new Error(`indexer.getCursor: ${result.error.message}`);
   }
@@ -50,7 +34,7 @@ export async function setCursor(
   if (current !== null && current >= lastBlock) {
     return;
   }
-  const result = await untypedDb()
+  const result = await createServiceClient()
     .from('indexer_cursors')
     .upsert(
       {
