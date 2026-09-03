@@ -170,7 +170,7 @@ Every function from the release checklist, both roles. Status reflects the state
 | 5 | Filter by class and per-class fields | Implemented | VIDEO_LINK_PENDING |
 | 6 | View asset and documents | Implemented | VIDEO_LINK_PENDING |
 | 7 | Buy with USDC | Implemented | VIDEO_LINK_PENDING |
-| 8 | Buy with another token via swap | Implemented | VIDEO_LINK_PENDING |
+| 8 | Buy with another token via swap | NOT implemented, see section 9 item 10. The tab is present and states clearly that it is coming soon. | none |
 | 9 | Buy with card via on-ramp | Implemented; production activation needs Transak partner credentials (section 9) | VIDEO_LINK_PENDING |
 | 10 | KYC-gated asset blocked when unverified, allowed when verified | Implemented | VIDEO_LINK_PENDING |
 | 11 | Portfolio with holdings and average entry price | Implemented | VIDEO_LINK_PENDING |
@@ -365,6 +365,21 @@ build succeeds. The gaps below are the work that remains.
    verification used a local node with the contracts deployed fresh. Before
    production, run the same journeys against Base Sepolia with a funded key,
    then repeat the smoke test in section 8f on mainnet with a small purchase.
+10. Buying with another token via swap is not implemented. The checkout shows
+   a Swap tab that says the option is coming soon. This is not a regression:
+   in the legacy application the token picker was commented out (see
+   `legacy/rwa_marketplace/src/app/asset/[saleId]/buy/[noOfFractionsToBuy]/page.tsx`
+   around line 309), which left its `Bridge.Buy` branch unreachable, so the
+   function never worked in the shipped product either. Implementing it means
+   a token picker, a `Bridge.Buy.quote` and `Bridge.Buy.prepare` pair, running
+   the returned steps, polling `Bridge.status` until the USDC arrives, and then
+   continuing into the existing approve and buyFractions path, which is the
+   same fund-then-purchase shape the card on-ramp already uses. It was left out
+   of this release deliberately because thirdweb Bridge does not support a
+   local chain and needs real credentials, so the code could not have been
+   verified end to end here; shipping it unverified would have contradicted the
+   rest of this release. Verify it on Base Sepolia with a funded wallet.
+
 9. Test-only surfaces exist behind flags and must stay disabled in production.
    `/api/test-auth` returns 404 unless `TEST_MODE=1` and it refuses to run on
    Vercel, and the local signer plus the mock on-ramp are gated on
