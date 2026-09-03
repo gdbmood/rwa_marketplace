@@ -12,7 +12,7 @@ import {
   getOrdersForUser,
   transitionOrder,
 } from '@/lib/db/orders';
-import { getApprovedKycForUser } from '@/lib/sumsub/kyc';
+import { getApprovedKycForUser } from '@/lib/db/kyc';
 import { getPlatformFeeBps } from '@/actions/chain';
 import {
   type QuotedFill,

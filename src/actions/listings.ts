@@ -1,7 +1,7 @@
 'use server';
 
 import { requireUser } from '@/lib/auth/session';
-import { getAssetById } from '@/lib/db/assets';
+import { getAssetById, setAssetStatus } from '@/lib/db/assets';
 import {
   type ListingRow,
   cancelListing as cancelListingRow,
@@ -218,6 +218,18 @@ export async function cancelListing(
         console.error(
           `[listings.cancelListing] failed to unlock ${canceled.quantity} fractions for listing ${canceled.id}`,
         );
+      }
+    }
+
+    // Canceling the primary listing takes the asset off sale: reflect that on
+    // the asset row so the dashboard shows it as delisted. Secondary cancels
+    // never touch the asset status.
+    if (canceled.kind === 'primary') {
+      try {
+        await setAssetStatus(canceled.asset_id, 'delisted');
+      } catch (statusError) {
+        // The indexer's reconcile pass is the backstop for asset state.
+        console.error('[listings.cancelListing] failed to mark asset delisted:', statusError);
       }
     }
 

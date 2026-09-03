@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import type { Json } from '@/types/database';
 import { getUserByWallet, setUserVerified } from '@/lib/db/users';
 import { verifyWebhookDigest } from '@/lib/sumsub/client';
-import { type KycStatus, upsertKycByExternalId } from '@/lib/sumsub/kyc';
+import { type KycStatus, upsertKycByExternalId } from '@/lib/db/kyc';
 
 interface SumsubWebhookPayload {
   type?: string;

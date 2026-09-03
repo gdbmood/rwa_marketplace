@@ -10,8 +10,7 @@ import {
   SESSION_COOKIE_OPTIONS,
   verifySessionJwt,
 } from '@/lib/auth/session';
-import { upsertUserOnLogin } from '@/lib/db/users';
-import type { userTypes } from '@/types/Users';
+import { type UserType, upsertUserOnLogin } from '@/lib/db/users';
 import { type ActionResult, err, ok, toActionError } from '@/actions/result';
 
 let thirdwebAuth: ReturnType<typeof createAuth> | null = null;
@@ -42,7 +41,7 @@ export async function generatePayload(address: string) {
  */
 export async function login(
   payload: VerifyLoginPayloadParams,
-  userType: userTypes = 'retail',
+  userType: UserType = 'retail',
 ): Promise<ActionResult<{ wallet: string }>> {
   try {
     const auth = getThirdwebAuth();
