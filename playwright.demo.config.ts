@@ -46,7 +46,7 @@ export default defineConfig({
     command: 'npx tsx e2e/start-web.ts',
     port: APP_PORT,
     reuseExistingServer: true,
-    timeout: 240_000,
+    timeout: 480_000,
     stdout: 'pipe',
     stderr: 'pipe',
   },
