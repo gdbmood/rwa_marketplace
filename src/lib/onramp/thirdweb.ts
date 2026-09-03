@@ -2,7 +2,7 @@ import 'server-only';
 
 import { Bridge, createThirdwebClient, type ThirdwebClient } from 'thirdweb';
 import type { Json } from '@/types/database';
-import { MissingEnvError, publicEnv, serverEnv } from '@/lib/env';
+import { publicEnv, serverEnv } from '@/lib/env';
 import { mapThirdwebOnrampStatus } from '@/lib/onramp/statusMap';
 import { microToUsdc, usdcToMicro } from '@/lib/onramp/usdc';
 import {
@@ -56,15 +56,10 @@ function getSubProvider(): ThirdwebSubProvider {
 
 /**
  * Secret configured on the thirdweb webhook, used to verify x-payload
- * signatures. Read directly from process.env because src/lib/env.ts is owned
- * by another workstream; adding it there is recorded as a handoff.
+ * signatures.
  */
 function getWebhookSecret(): string {
-  const value = process.env.THIRDWEB_WEBHOOK_SECRET;
-  if (!value) {
-    throw new MissingEnvError('THIRDWEB_WEBHOOK_SECRET');
-  }
-  return value;
+  return serverEnv.thirdwebWebhookSecret;
 }
 
 function asAddress(value: string, label: string): `0x${string}` {
